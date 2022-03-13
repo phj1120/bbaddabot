@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -46,7 +45,6 @@ func main() {
 	// Cleanly close down the Discord session.
 	dg.Close()
 }
-
 
 func myVociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate){
 	if v.VoiceState == nil{
