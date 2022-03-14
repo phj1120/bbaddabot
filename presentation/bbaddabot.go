@@ -1,4 +1,4 @@
-package main
+package presentation
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 var token string
 var buffer = make([][]byte, 0)
 
-func main() {
+func Main() {
 	token := os.Getenv("BBADDABOTTOKEN")
 	
 	// Create a new Discord session using the provided bot token.
