@@ -11,16 +11,18 @@ create table history(
 );
 
 create table study_total(
+	`no` int auto_increment,
     `username` varchar(20),
     `study_time` time not null,
     `date` datetime not null,
     
-    primary key (`username`)
+    primary key (`no`)
 );
 
 create table channel_total(
+	`no` int auto_increment,
     username varchar(20),
     bbadda int,
     
-    primary key (username)
+    primary key (`no`)
 );
