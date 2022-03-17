@@ -33,7 +33,7 @@ func InsertstudyTotal(h ds.StudyTotal) (*int64, error) {
 	return &id, e
 }
 
-func SelectTodaystudyTotal(userName string) ([]ds.studyTotal, error) {
+func SelectTodaystudyTotal(userName string) ([]ds.StudyTotal, error) {
 	db := dbConn()
 	sql := `SELECT * 
 			FROM studyTotal 
@@ -48,11 +48,11 @@ func SelectTodaystudyTotal(userName string) ([]ds.studyTotal, error) {
 		return nil, err
 	}
 
-	var studyTotals []ds.studyTotal
-	var studyTotal ds.studyTotal
+	var studyTotals []ds.StudyTotal
+	var studyTotal ds.StudyTotal
 
 	for res.Next() {
-		err := res.Scan(&studyTotal.No, &studyTotal.Username, &studyTotal.Before_channel, &studyTotal.After_channel, &studyTotal.Time)
+		err := res.Scan(&studyTotal.No, &studyTotal.Username, &studyTotal.Study_time, &studyTotal.Date)
 		if err != nil {
 			return nil, err
 		}
@@ -63,11 +63,12 @@ func SelectTodaystudyTotal(userName string) ([]ds.studyTotal, error) {
 	return studyTotals, nil
 }
 
-func UpdatestudyTotal(h ds.studyTotal) (*int64, error) {
+func UpdatestudyTotal(h ds.StudyTotal) (*int64, error) {
+
 	return nil, nil
 }
 
-func DeletestudyTotal(h ds.studyTotal) (*int64, error) {
+func DeletestudyTotal(h ds.StudyTotal) (*int64, error) {
 	return nil, nil
 
 }

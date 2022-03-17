@@ -1,13 +1,13 @@
 package main
 
 import (
-	// "bbaddabot/presentation"
-	"bbaddabot/persistence"
+	"bbaddabot/presentation"
+	// "bbaddabot/persistence"
 )
 
 func main() {
-	persistence.InsertHistory()
-	persistence.SelectTodayHistory("hj")
+	// persistence.InsertHistory()
+	// persistence.SelectTodayHistory("hj")
 	// presentation.PresentationTest()
-	// presentation.Bbaddabot()
+	presentation.Bbaddabot()
 }

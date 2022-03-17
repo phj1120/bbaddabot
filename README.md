@@ -22,6 +22,7 @@ Go layered Arcitecture
 
 
 ## 기록
+https://parkhj.notion.site/da3f8fe5a214450386461b4e2f7f33e6
 ### 2022.03.16.
 ```
 금방 끝날 줄 알았는데 점점 길어짐

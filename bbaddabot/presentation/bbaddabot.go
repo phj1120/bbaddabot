@@ -1,10 +1,11 @@
 package presentation
 
 import (
-	"bbaddabot/business"
+	// "bbaddabot/business"
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -12,8 +13,8 @@ import (
 )
 
 func PresentationTest() {
-	fmt.Println("PresentationTest")
-	business.BusinessTest()
+	// fmt.Println("PresentationTest")
+	// business.BusinessTest()
 }
 
 func Bbaddabot() {
@@ -27,8 +28,8 @@ func Bbaddabot() {
 	}
 
 	dg.AddHandler(messageCreate)
-
-	dg.AddHandler(myVociceStatusUpdate)
+	// dg.AddHandler(myVociceStatusUpdate)
+	// dg.AddHandler(threadUpdate)
 
 	// We need information about guilds (which includes their channels),
 	// messages and voice states.
@@ -41,13 +42,36 @@ func Bbaddabot() {
 	}
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Airhorn is now running.  Press CTRL-C to exit.")
+	fmt.Println("BBADDABOT is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
 	// Cleanly close down the Discord session.
 	dg.Close()
+}
+
+func log(s *discordgo.Session, msg string) {
+	fmt.Println(msg)
+	s.ChannelMessageSend("954047325448335410", msg)
+}
+
+// 채널 편집 시 이벤트 발생
+func channelUpdate(s *discordgo.Session, c *discordgo.ChannelUpdate) {
+	msg := c.ID
+	log(s, msg)
+}
+
+// 스레드.. 텍스트 메시지 관련된것 같은데 잘 모르겠네
+func threadUpdate(s *discordgo.Session, t *discordgo.ThreadUpdate) {
+	msg := t.Channel.ID
+	log(s, msg)
+}
+
+// 재접속일 줄 알았는데 내가 원하는 재접속은 아니었음
+func presenceUpdate(s *discordgo.Session, p *discordgo.PresenceUpdate) {
+	msg := p.User
+	log(s, msg.ID)
 }
 
 func myVociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
@@ -94,8 +118,35 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// 강퇴 성공
+	strs := m.Content
+	slice := strings.Split(strs, "=")
+
+	if slice[0] == "!강퇴" {
+		s.GuildMemberDeleteWithReason(m.GuildID, slice[1], "강퇴")
+	}
+
 	currntChannel, _ := s.Channel(m.ChannelID)
 	currntChannelName := currntChannel.Name
+
+	// 제자리 이동 가능
+	// !이동=759364130569584640.954049652003602452
+	if slice[0] == "!이동" {
+		tmp := strings.Split(slice[1], ".")
+		s.GuildMemberMove(m.GuildID, tmp[0], &tmp[1])
+	}
+
+	// !채널=954049652003602452
+	if slice[0] == "!채널" {
+		guild, _ := s.State.Guild(m.GuildID)
+		voices := guild.VoiceStates
+
+		print(len(voices))
+		// n := 0
+		// for n < len(voices) {
+		// 	log(s, voices[n].UserID)
+		// }
+	}
 
 	msg := fmt.Sprintf("%s %s %s %s", m.Timestamp.Format("20060102 15:04:05"), currntChannelName, m.Author.Username, m.Content)
 
