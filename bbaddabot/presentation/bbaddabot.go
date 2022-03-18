@@ -28,7 +28,7 @@ func Bbaddabot() {
 	}
 
 	dg.AddHandler(messageCreate)
-	// dg.AddHandler(myVociceStatusUpdate)
+	dg.AddHandler(myVociceStatusUpdate)
 	// dg.AddHandler(threadUpdate)
 
 	// We need information about guilds (which includes their channels),
@@ -86,20 +86,40 @@ func myVociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
 	// 지금 이거 너무 비효율 적임 일단 이렇게 짜고 로직 수정하기
 	// 채널 이름 읽고 그러는거  오래 걸린다.
 	// 채널 여기서 안읽고 하고 DB 에서 읽기?
-	if v.BeforeUpdate != nil && v.VoiceState.ChannelID == "" {
-		beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
-		msg = fmt.Sprintf("%s%s%s%s%s%s", nowTime, " ", userName, " ", beforeChannelName, " 종료")
-		fmt.Println(msg)
-	} else if v.BeforeUpdate != nil && v.VoiceState != nil {
-		beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
+
+	// voicechannel 에 변경이 발생할 경우
+	// fmt.Println(v.BeforeUpdate)
+	// fmt.Println(v.VoiceState)
+
+	// 입장
+	if v.BeforeUpdate == nil && v.VoiceState != nil {
 		afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
-		msg = fmt.Sprintf("%s%s%s%s%s%s%s", nowTime, " ", userName, " 이동 : ", beforeChannelName, " -> ", afterChannelName)
-		fmt.Println(msg)
-	} else if v.BeforeUpdate == nil && v.VoiceState.ChannelID != "" {
-		afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
-		msg = fmt.Sprintf("%s%s%s%s%s%s", nowTime, " ", userName, " ", afterChannelName, " 입장")
-		fmt.Println(msg)
+		msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 시작 : ", afterChannelName)
 	}
+
+	// 채널간 이동이 발생한 경우
+	if v.BeforeUpdate != nil && v.VoiceState != nil {
+
+		// 동일 채널일 경우 종료
+		if v.BeforeUpdate.ChannelID == v.VoiceState.ChannelID {
+			return
+
+			// 퇴장, 퇴장 시 채널 아이디만 없고 나머지 정보 존재
+		} else if v.BeforeUpdate != nil && v.VoiceState.ChannelID == "" {
+			beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
+			msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 종료 : ", beforeChannelName)
+
+			// 다른 채널로 변경할 경우
+		} else {
+			// 다른 채널로 이동한 경우
+			// 이전 채널이 공부 인 경우
+			// 이전 채널이 휴식 인 경우
+			beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
+			afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
+			msg = fmt.Sprintf("%s%s%s%s%s%s%s", nowTime, " ", userName, " 이동 : ", beforeChannelName, " -> ", afterChannelName)
+		}
+	}
+	fmt.Println(msg)
 	s.ChannelMessageSend("952057033476177920", msg)
 }
 
@@ -126,9 +146,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.GuildMemberDeleteWithReason(m.GuildID, slice[1], "강퇴")
 	}
 
-	currntChannel, _ := s.Channel(m.ChannelID)
-	currntChannelName := currntChannel.Name
-
 	// 제자리 이동 가능
 	// !이동=759364130569584640.954049652003602452
 	if slice[0] == "!이동" {
@@ -148,10 +165,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// }
 	}
 
-	msg := fmt.Sprintf("%s %s %s %s", m.Timestamp.Format("20060102 15:04:05"), currntChannelName, m.Author.Username, m.Content)
-
-	// 채팅 로그 채널에 메시지 전송
-	s.ChannelMessageSend("952040735090294804", msg)
-	// 출력
-	fmt.Println(msg)
+	// 채팅 로그
+	// currntChannel, _ := s.Channel(m.ChannelID)
+	// currntChannelName := currntChannel.Name
+	// msg := fmt.Sprintf("%s %s %s %s", m.Timestamp.Format("20060102 15:04:05"), currntChannelName, m.Author.Username, m.Content)
+	// s.ChannelMessageSend("952040735090294804", msg)
+	// fmt.Println(msg)
 }
