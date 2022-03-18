@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func PresentationTest() {
 	fmt.Println("PresentationTest")
-	business.BusinessUserTest()
+	// business.UserDaoTest()
+	// business.HistoryDaoTest()
+	// business.StudyTotalDaoTest()
+	business.ChannelTest()
+	// business.ChangeChannel()
 }
 
 func Bbaddabot() {
@@ -61,55 +63,57 @@ func vociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
 		return
 	}
 
-	userName := getUserName(s, v.VoiceState.UserID)
-	nowTime := time.Now().Format("20060102 15:04:05")
-	msg := "None"
-
-	// voicechannel 에 변경이 발생할 경우
-	fmt.Println(v.BeforeUpdate)
-	fmt.Println(v.VoiceState)
-
-	// 입장
-	if v.BeforeUpdate == nil && v.VoiceState != nil {
-		afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
-		msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 시작 : ", afterChannelName)
-		// updateHistroy()
-	}
-
-	// 채널간 이동이 발생한 경우
-	if v.BeforeUpdate != nil && v.VoiceState != nil {
-		//	이렇게 짜는거는 비즈니스 계층에다가 하는게 좋을 거 같음
-		//  여긴 서비스 계층이니까
-		// 비지니스 계층에다가 userMove(VoiceState, BeforeUpdate) 이렇게 던지고
-		// 비교해서 처리하게 하는게 나을 듯
-
-		// 동일 채널일 경우 종료
-		if v.BeforeUpdate.ChannelID == v.VoiceState.ChannelID {
-			return
-
-			// 퇴장, 퇴장 시 채널 아이디만 없고 나머지 정보 존재
-		} else if v.BeforeUpdate != nil && v.VoiceState.ChannelID == "" {
-			// updateHistory()
-			beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
-			msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 종료 : ", beforeChannelName)
-		} else {
-			// 	// 다른 채널로 이동한 경우
-			// 	// 이전 채널이 공부 인 경우
-			// channelType = getChannelType
-			// if channelType == '공부'
-
-			// 	updateHistory()
-			// 	updateStudyTime()
-			// // 이전 채널이 휴식 인 경우
-			// else if channelType == '휴식'
-			// 	updateHistory()
-
-			beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
-			afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
-			msg = fmt.Sprintf("%s%s%s%s%s%s%s", nowTime, " ", userName, " 이동 : ", beforeChannelName, " -> ", afterChannelName)
-		}
-	}
+	msg := business.ChangeChannel(*v)
 	fmt.Println(msg)
+	// userName := getUserName(s, v.VoiceState.UserID)
+	// nowTime := time.Now().Format("20060102 15:04:05")
+	// msg := "None"
+
+	// // voicechannel 에 변경이 발생할 경우
+	// fmt.Println(v.BeforeUpdate)
+	// fmt.Println(v.VoiceState)
+
+	// // 입장
+	// if v.BeforeUpdate == nil && v.VoiceState != nil {
+	// 	afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
+	// 	msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 시작 : ", afterChannelName)
+	// 	// updateHistroy()
+	// }
+
+	// // 채널간 이동이 발생한 경우
+	// if v.BeforeUpdate != nil && v.VoiceState != nil {
+	// 	//	이렇게 짜는거는 비즈니스 계층에다가 하는게 좋을 거 같음
+	// 	//  여긴 서비스 계층이니까
+	// 	// 비지니스 계층에다가 userMove(VoiceState, BeforeUpdate) 이렇게 던지고
+	// 	// 비교해서 처리하게 하는게 나을 듯
+
+	// 	// 동일 채널일 경우 종료
+	// 	if v.BeforeUpdate.ChannelID == v.VoiceState.ChannelID {
+	// 		return
+
+	// 		// 퇴장, 퇴장 시 채널 아이디만 없고 나머지 정보 존재
+	// 	} else if v.BeforeUpdate != nil && v.VoiceState.ChannelID == "" {
+	// 		// updateHistory()
+	// 		beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
+	// 		msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 종료 : ", beforeChannelName)
+	// 	} else {
+	// 		// 	// 다른 채널로 이동한 경우
+	// 		// 	// 이전 채널이 공부 인 경우
+	// 		// channelType = getChannelType
+	// 		// if channelType == '공부'
+
+	// 		// 	updateHistory()
+	// 		// 	updateStudyTime()
+	// 		// // 이전 채널이 휴식 인 경우
+	// 		// else if channelType == '휴식'
+	// 		// 	updateHistory()
+
+	// 		beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
+	// 		afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
+	// 		msg = fmt.Sprintf("%s%s%s%s%s%s%s", nowTime, " ", userName, " 이동 : ", beforeChannelName, " -> ", afterChannelName)
+	// 	}
+	// }
+	// fmt.Println(msg)
 	s.ChannelMessageSend("952057033476177920", msg)
 }
 
@@ -130,34 +134,34 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// 강퇴 성공
 	strs := m.Content
-	slice := strings.Split(strs, "=")
+	// slice := strings.Split(strs, "=")
 
 	if strs == "!test" {
 		PresentationTest()
 	}
 
-	if slice[0] == "!강퇴" {
-		s.GuildMemberDeleteWithReason(m.GuildID, slice[1], "강퇴")
-	}
+	// if slice[0] == "!강퇴" {
+	// 	s.GuildMemberDeleteWithReason(m.GuildID, slice[1], "강퇴")
+	// }
 
-	// 제자리 이동 가능
-	// !이동=759364130569584640.954049652003602452
-	if slice[0] == "!이동" {
-		tmp := strings.Split(slice[1], ".")
-		s.GuildMemberMove(m.GuildID, tmp[0], &tmp[1])
-	}
+	// // 제자리 이동 가능
+	// // !이동=759364130569584640.954049652003602452
+	// if slice[0] == "!이동" {
+	// 	tmp := strings.Split(slice[1], ".")
+	// 	s.GuildMemberMove(m.GuildID, tmp[0], &tmp[1])
+	// }
 
-	// !채널=954049652003602452
-	if slice[0] == "!채널" {
-		guild, _ := s.State.Guild(m.GuildID)
-		voices := guild.VoiceStates
+	// // !채널=954049652003602452
+	// if slice[0] == "!채널" {
+	// 	guild, _ := s.State.Guild(m.GuildID)
+	// 	voices := guild.VoiceStates
 
-		print(len(voices))
-		// n := 0
-		// for n < len(voices) {
-		// 	log(s, voices[n].UserID)
-		// }
-	}
+	// 	print(len(voices))
+	// 	// n := 0
+	// 	// for n < len(voices) {
+	// 	// 	log(s, voices[n].UserID)
+	// 	// }
+	// }
 
 	// 채팅 로그
 	// currntChannel, _ := s.Channel(m.ChannelID)

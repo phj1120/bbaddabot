@@ -1,74 +1,57 @@
 package persistence
 
-// import (
-// 	ds "bbaddabot/datastruct"
-// 	_ "database/sql"
-// 	"fmt"
+import (
+	ds "bbaddabot/datastruct"
+	_ "database/sql"
 
-// 	_ "github.com/go-sql-driver/mysql"
-// )
+	_ "github.com/go-sql-driver/mysql"
+)
 
-// // No, Username, Study_time, Study_time
+// userNum, studyTime, date
 
-// func InsertstudyTotal(h ds.StudyTotal) (*int64, error) {
-// 	db := dbConn()
-// 	sql := `insert into study_total(username, study_time, date)
-// 			values (?, ?, DATE(now()))`
+// 공부 시간 생성(당일 처음 공부 시작한 경우 )
+func InsertNewStudyTotal(userNum int, studyTime int) int {
+	db := dbConn()
+	sql := `INSERT INTO  studyTotal (userNum, studyTime, date) 
+	VALUES(?, ?, DATE(now()));`
 
-// 	stmt, err := db.Prepare(sql)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	stmt, _ := db.Prepare(sql)
+	res, _ := stmt.Exec(userNum, studyTime)
+	id, _ := res.LastInsertId()
 
-// 	res, err := stmt.Exec(h.Username, h.Study_time, h.Date)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	return int(id)
+}
 
-// 	id, e := res.LastInsertId()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// 오늘 공부 시간 조회
+func SelectStudyTotalTodayByUserNum(userNum int) (int, error) {
+	db := dbConn()
+	sql := `SELECT studyTime
+			FROM studyTotal
+			WHERE date=DATE(NOW()) AND userNum=?`
+	stmt, _ := db.Prepare(sql)
 
-// 	return &id, e
-// }
+	// 행 하나 : QueryRow
+	var studyTime int
+	err := stmt.QueryRow(userNum).Scan(&studyTime)
 
-// func SelectTodaystudyTotal(userName string) ([]ds.StudyTotal, error) {
-// 	db := dbConn()
-// 	sql := `SELECT *
-// 			FROM studyTotal
-// 			WHERE username = ? AND DATE(time) = DATE(NOW())`
-// 	stmt, err := db.Prepare(sql)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	return studyTime, err
+}
 
-// 	res, err := stmt.Query(userName)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// 공부 시간 업데이트 후 영향 받은 행 개수 반환
+func UpdateStudyTimeByUserNumAndStudyTime(userNum int, studyTime int) int {
+	db := dbConn()
+	sql := `UPDATE studyTotal 
+			SET studytime = studytime + ?
+			WHERE date=DATE(NOW()) AND userNum=?`
+	stmt, _ := db.Prepare(sql)
+	res, _ := stmt.Exec(studyTime, userNum)
 
-// 	var studyTotals []ds.StudyTotal
-// 	var studyTotal ds.StudyTotal
+	cnt, _ := res.RowsAffected()
 
-// 	for res.Next() {
-// 		err := res.Scan(&studyTotal.No, &studyTotal.Username, &studyTotal.Study_time, &studyTotal.Date)
-// 		if err != nil {
-// 			return nil, err
-// 		}
+	return int(cnt)
+}
 
-// 		fmt.Println(studyTotal)
-// 		studyTotals = append(studyTotals, studyTotal)
-// 	}
-// 	return studyTotals, nil
-// }
+func DeletestudyTotal(h ds.StudyTotal) (*int64, error) {
+	return nil, nil
 
-// func UpdatestudyTotal(h ds.StudyTotal) (*int64, error) {
-
-// 	return nil, nil
-// }
-
-// func DeletestudyTotal(h ds.StudyTotal) (*int64, error) {
-// 	return nil, nil
-
-// }
+}
