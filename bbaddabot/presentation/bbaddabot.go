@@ -1,7 +1,7 @@
 package presentation
 
 import (
-	// "bbaddabot/business"
+	"bbaddabot/business"
 	"fmt"
 	"os"
 	"os/signal"
@@ -13,8 +13,8 @@ import (
 )
 
 func PresentationTest() {
-	// fmt.Println("PresentationTest")
-	// business.BusinessTest()
+	fmt.Println("PresentationTest")
+	business.BusinessUserTest()
 }
 
 func Bbaddabot() {
@@ -28,7 +28,7 @@ func Bbaddabot() {
 	}
 
 	dg.AddHandler(messageCreate)
-	dg.AddHandler(myVociceStatusUpdate)
+	dg.AddHandler(vociceStatusUpdate)
 	// dg.AddHandler(threadUpdate)
 
 	// We need information about guilds (which includes their channels),
@@ -56,25 +56,7 @@ func log(s *discordgo.Session, msg string) {
 	s.ChannelMessageSend("954047325448335410", msg)
 }
 
-// 채널 편집 시 이벤트 발생
-func channelUpdate(s *discordgo.Session, c *discordgo.ChannelUpdate) {
-	msg := c.ID
-	log(s, msg)
-}
-
-// 스레드.. 텍스트 메시지 관련된것 같은데 잘 모르겠네
-func threadUpdate(s *discordgo.Session, t *discordgo.ThreadUpdate) {
-	msg := t.Channel.ID
-	log(s, msg)
-}
-
-// 재접속일 줄 알았는데 내가 원하는 재접속은 아니었음
-func presenceUpdate(s *discordgo.Session, p *discordgo.PresenceUpdate) {
-	msg := p.User
-	log(s, msg.ID)
-}
-
-func myVociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
+func vociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
 	if v.VoiceState == nil {
 		return
 	}
@@ -83,22 +65,23 @@ func myVociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
 	nowTime := time.Now().Format("20060102 15:04:05")
 	msg := "None"
 
-	// 지금 이거 너무 비효율 적임 일단 이렇게 짜고 로직 수정하기
-	// 채널 이름 읽고 그러는거  오래 걸린다.
-	// 채널 여기서 안읽고 하고 DB 에서 읽기?
-
 	// voicechannel 에 변경이 발생할 경우
-	// fmt.Println(v.BeforeUpdate)
-	// fmt.Println(v.VoiceState)
+	fmt.Println(v.BeforeUpdate)
+	fmt.Println(v.VoiceState)
 
 	// 입장
 	if v.BeforeUpdate == nil && v.VoiceState != nil {
 		afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
 		msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 시작 : ", afterChannelName)
+		// updateHistroy()
 	}
 
 	// 채널간 이동이 발생한 경우
 	if v.BeforeUpdate != nil && v.VoiceState != nil {
+		//	이렇게 짜는거는 비즈니스 계층에다가 하는게 좋을 거 같음
+		//  여긴 서비스 계층이니까
+		// 비지니스 계층에다가 userMove(VoiceState, BeforeUpdate) 이렇게 던지고
+		// 비교해서 처리하게 하는게 나을 듯
 
 		// 동일 채널일 경우 종료
 		if v.BeforeUpdate.ChannelID == v.VoiceState.ChannelID {
@@ -106,14 +89,21 @@ func myVociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
 
 			// 퇴장, 퇴장 시 채널 아이디만 없고 나머지 정보 존재
 		} else if v.BeforeUpdate != nil && v.VoiceState.ChannelID == "" {
+			// updateHistory()
 			beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
 			msg = fmt.Sprintf("%s%s%s%s%s", nowTime, " ", userName, " 종료 : ", beforeChannelName)
-
-			// 다른 채널로 변경할 경우
 		} else {
-			// 다른 채널로 이동한 경우
-			// 이전 채널이 공부 인 경우
-			// 이전 채널이 휴식 인 경우
+			// 	// 다른 채널로 이동한 경우
+			// 	// 이전 채널이 공부 인 경우
+			// channelType = getChannelType
+			// if channelType == '공부'
+
+			// 	updateHistory()
+			// 	updateStudyTime()
+			// // 이전 채널이 휴식 인 경우
+			// else if channelType == '휴식'
+			// 	updateHistory()
+
 			beforeChannelName := getChannelName(s, v.BeforeUpdate.ChannelID)
 			afterChannelName := getChannelName(s, v.VoiceState.ChannelID)
 			msg = fmt.Sprintf("%s%s%s%s%s%s%s", nowTime, " ", userName, " 이동 : ", beforeChannelName, " -> ", afterChannelName)
@@ -141,6 +131,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// 강퇴 성공
 	strs := m.Content
 	slice := strings.Split(strs, "=")
+
+	if strs == "!test" {
+		PresentationTest()
+	}
 
 	if slice[0] == "!강퇴" {
 		s.GuildMemberDeleteWithReason(m.GuildID, slice[1], "강퇴")
@@ -171,4 +165,23 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// msg := fmt.Sprintf("%s %s %s %s", m.Timestamp.Format("20060102 15:04:05"), currntChannelName, m.Author.Username, m.Content)
 	// s.ChannelMessageSend("952040735090294804", msg)
 	// fmt.Println(msg)
+}
+
+// 기타 기능
+// 채널 편집 시 이벤트 발생
+func channelUpdate(s *discordgo.Session, c *discordgo.ChannelUpdate) {
+	msg := c.ID
+	log(s, msg)
+}
+
+// 스레드.. 텍스트 메시지 관련된것 같은데 잘 모르겠네
+func threadUpdate(s *discordgo.Session, t *discordgo.ThreadUpdate) {
+	msg := t.Channel.ID
+	log(s, msg)
+}
+
+// 재접속일 줄 알았는데 내가 원하는 재접속은 아니었음
+func presenceUpdate(s *discordgo.Session, p *discordgo.PresenceUpdate) {
+	msg := p.User
+	log(s, msg.ID)
 }

@@ -5,9 +5,10 @@ import (
 )
 
 type History struct {
-	No             int       `db:"no"`
-	Username       string    `db:"username"`
-	Before_channel string    `db:"before_channel"`
-	After_channel  string    `db:"after_channel"`
-	Time           time.Time `db:"time"`
+	No              int
+	UserNum         int
+	BeforeChannelId string
+	AfterChannelId  string
+	Time            time.Time
+	HistoryType     string
 }

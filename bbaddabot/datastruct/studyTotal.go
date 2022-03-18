@@ -6,7 +6,7 @@ import (
 
 type StudyTotal struct {
 	No         int
-	Username   string
+	UserNum    int
 	Study_time int
 	Date       time.Time
 }
