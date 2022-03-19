@@ -9,13 +9,27 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func ChangeChannel(v discordgo.VoiceStateUpdate) string {
-	fmt.Println("Change Channel")
+func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
+	// fmt.Println("Change Channel")
 	var subMsg string
 	var msg string
 	h := ds.History{}
-	h.UserNum, _ = ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
-	user, _ := ps.SelectUserByUserNum(h.UserNum)
+
+	// 유저가 없는 경우 유저 추가
+	userNum, err := ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
+
+	if err != nil {
+		user := ds.User{}
+		user.UserId = v.UserID
+		user.GuildId = v.GuildID
+		userTmp, _ := s.User(v.UserID)
+		user.UserName = userTmp.Username
+		ps.InsertUser(user)
+		user, _ = ps.SelectUserByUserNum(h.UserNum)
+		userNum, _ = ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
+	}
+	h.UserNum = userNum
+	user, err := ps.SelectUserByUserNum(h.UserNum)
 	userName := user.UserName
 
 	// 채널간 이동이 발생한 경우
@@ -40,15 +54,14 @@ func ChangeChannel(v discordgo.VoiceStateUpdate) string {
 				subMsg = fmt.Sprintf("%s%s%s%s", " / 이동 : ", beforeChannelName, " -> ", afterChannelName)
 			}
 		}
-
 		// 이동 기록 삽입
-		LastUpdateNo, err := ps.InsertHistory(h)
+		_, err := ps.InsertHistory(h)
 		if err != nil {
 			return "err"
 		}
 
 		// 채널에 있었던 시간(분) 계산
-		spentMinute := ps.SelectMinuteSpentChannel(LastUpdateNo)
+		spentMinute := ps.SelectMinuteSpentChannel2(userNum)
 
 		// 공부 기록인 경우 총합 공부 시간 갱신
 		if h.HistoryType == "study" {
@@ -61,7 +74,7 @@ func ChangeChannel(v discordgo.VoiceStateUpdate) string {
 				ps.UpdateStudyTimeByUserNumAndStudyTime(h.UserNum, spentMinute)
 			}
 		}
-		msg = fmt.Sprintf("%s%s%s%s%d%s%s%s", time.Now(), " ", userName, " ", spentMinute, " 분 ", h.HistoryType, subMsg)
+		msg = fmt.Sprintf("%s%s%s%s%d%s%s%s", time.Now().Format("20060102 15:04:05"), " ", userName, " ", spentMinute, " 분 ", h.HistoryType, subMsg)
 	}
 
 	// 이전 채널이 없는 경우 - 입장
@@ -74,7 +87,7 @@ func ChangeChannel(v discordgo.VoiceStateUpdate) string {
 		if err != nil {
 			return "err"
 		}
-		msg = fmt.Sprintf("%s%s%s%s", time.Now(), " ", userName, subMsg)
+		msg = fmt.Sprintf("%s%s%s%s", time.Now().Format("20060102 15:04:05"), " ", userName, subMsg)
 	}
 
 	return msg

@@ -57,3 +57,26 @@ func SelectMinuteSpentChannel(historyNo int) int {
 	stmt.QueryRow(historyNo, historyNo).Scan(&studyTime)
 	return studyTime
 }
+
+// UserNum 을 받아서 최신의 값 2개만 가져오고 그 값으로 비교해보자.
+func SelectMinuteSpentChannel2(userNum int) int {
+	db := dbConn()
+	sql := `
+	SELECT TIMESTAMPDIFF(MINUTE,
+		(select time
+		from (SELECT time, rank() over (order by time desc) as 'rank'
+				FROM history
+				where userNum = ? and date(time) = date(now())) as recent
+		where recent.rank =2),
+		(select time
+		from (SELECT time, rank() over (order by time desc) as 'rank'
+				FROM history
+				where userNum = ? and date(time) = date(now())) as recent
+		where recent.rank =1)) as time;
+	`
+
+	stmt, _ := db.Prepare(sql)
+	var studyTime int
+	stmt.QueryRow(userNum, userNum).Scan(&studyTime)
+	return studyTime
+}
