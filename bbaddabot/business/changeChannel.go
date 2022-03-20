@@ -17,6 +17,8 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 
 	// 유저가 없는 경우 유저 추가
 	userNum, err := ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
+	ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
+
 	if err != nil {
 		user := ds.User{}
 		user.UserId = v.UserID

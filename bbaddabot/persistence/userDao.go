@@ -9,75 +9,90 @@ import (
 // userNum, userId, guildId, userName, bbadda, type
 func InsertUser(u ds.User) (*int64, error) {
 	db := dbConn()
-	sql := `INSERT INTO  user (userId, guildId, userName, bbadda, userType) 
-	VALUES(?, ?, ?, 0, 'user')`
+	err := db.Ping()
+	var id int64
+	if err == nil {
+		sql := `INSERT INTO  user (userId, guildId, userName, bbadda, userType) 
+		VALUES(?, ?, ?, 0, 'user')`
 
-	stmt, _ := db.Prepare(sql)
-	res, _ := stmt.Exec(u.UserId, u.GuildId, u.UserName)
-	id, err := res.LastInsertId()
-
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Exec(u.UserId, u.GuildId, u.UserName)
+		id, err = res.LastInsertId()
+		stmt.Close()
+	}
+	defer db.Close()
 	return &id, err
 }
 
 // User 조회
 func SelectUserByUserNum(userNum int) (ds.User, error) {
 	db := dbConn()
-	sql := `SELECT userNum, userId, guildId, userName, bbadda, userType
-	FROM user WHERE userNum=?`
-	stmt, _ := db.Prepare(sql)
-
+	err := db.Ping()
 	var user ds.User
-	err := stmt.QueryRow(userNum).Scan(&user.UserNum, &user.UserId, &user.GuildId, &user.UserName, &user.Bbadda, &user.UserType)
+	if err == nil {
+		sql := `SELECT userNum, userId, guildId, userName, bbadda, userType
+		FROM user WHERE userNum=?`
+		stmt, _ := db.Prepare(sql)
+
+		err = stmt.QueryRow(userNum).Scan(&user.UserNum, &user.UserId, &user.GuildId, &user.UserName, &user.Bbadda, &user.UserType)
+		stmt.Close()
+	}
+	defer db.Close()
 	return user, err
 }
 
 // UserNum 조회
 func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error) {
 	db := dbConn()
-	sql := `SELECT userNum
-	FROM user WHERE userId=? AND guildId=?`
-	stmt, _ := db.Prepare(sql)
-
-	// 행 하나 : QueryRow
-	var userNum int
-	err := stmt.QueryRow(userId, guildId).Scan(&userNum)
-
-	// 여러 행 : Query
-	// var userNum int
-	// res, err := stmt.Query(userId, guildId)
-	// for res.Next() {
-	// 	res.Scan(&userNum)
-	// }
-	return userNum, err
+	err := db.Ping()
+	var userNum int64
+	if err == nil {
+		sql := `SELECT userNum
+		FROM user WHERE userId=? AND guildId=?`
+		stmt, _ := db.Prepare(sql)
+		err = stmt.QueryRow(userId, guildId).Scan(&userNum)
+		stmt.Close()
+	}
+	defer db.Close()
+	db.Close()
+	return int(userNum), err
 }
 
 // 유저 타입
 func UpdateUserType(u ds.User) (*int64, error) {
 	db := dbConn()
-	sql := `UPDATE user SET type = ?
-	WHERE userNum = ?`
-
-	stmt, _ := db.Prepare(sql)
-	res, _ := stmt.Exec(u.UserType, u.UserId)
-
-	// auto_increment 반환
-	no, err := res.LastInsertId()
-
+	err := db.Ping()
+	var no int64
+	if err == nil {
+		sql := `UPDATE user SET type = ?
+		WHERE userNum = ?`
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Exec(u.UserType, u.UserId)
+		// auto_increment 반환
+		no, err = res.LastInsertId()
+		stmt.Close()
+	}
+	defer db.Close()
 	return &no, err
 }
 
 // 빠따 카운트 + 1
 func UpdateUserBbaddaByUserId(userId string) (*int64, error) {
 	db := dbConn()
-	sql := `UPDATE user SET bbadda = bbadda+1
-	WHERE userId = ?`
+	err := db.Ping()
+	var no int64
+	if err == nil {
+		sql := `UPDATE user SET bbadda = bbadda+1
+		WHERE userId = ?`
 
-	stmt, _ := db.Prepare(sql)
-	res, _ := stmt.Exec(userId)
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Exec(userId)
 
-	// auto_increment 반환
-	no, err := res.RowsAffected()
-
+		// auto_increment 반환
+		no, err = res.RowsAffected()
+		stmt.Close()
+	}
+	defer db.Close()
 	return &no, err
 }
 
@@ -93,4 +108,26 @@ func UpdateUserBbaddaByUserId(userId string) (*int64, error) {
 // 	cnt, err := res.RowsAffected()
 
 // 	return &cnt, err
+// }
+
+// SELECT 예시
+// func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error) {
+
+// 	db := dbConn()
+// 	sql := `SELECT userNum
+// 	FROM user WHERE userId=? AND guildId=?`
+// 	stmt, _ := db.Prepare(sql)
+
+// 	// 행 하나 : QueryRow
+// 	var userNum int
+// 	err := stmt.QueryRow(userId, guildId).Scan(&userNum)
+
+// 	// 여러 행 : Query
+// 	// var userNum int
+// 	// res, err := stmt.Query(userId, guildId)
+// 	// for res.Next() {
+// 	// 	res.Scan(&userNum)
+// 	// }
+// 	stmt.Close()
+// 	return userNum, err
 // }

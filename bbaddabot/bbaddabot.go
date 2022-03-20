@@ -1,4 +1,4 @@
-package presentation
+package main
 
 import (
 	"bbaddabot/business"

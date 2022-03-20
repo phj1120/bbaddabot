@@ -11,51 +11,73 @@ import (
 // 채널 추가
 func InsertChannel(c ds.Channel) int {
 	db := dbConn()
-	sql := `INSERT INTO  channel (guildId, channelId, channelName, channelType) 
-	VALUES(?, ?, ?, ?);`
+	err := db.Ping()
+	var id int64
+	if err == nil {
+		sql := `INSERT INTO  channel (guildId, channelId, channelName, channelType) 
+		VALUES(?, ?, ?, ?);`
 
-	stmt, _ := db.Prepare(sql)
-	res, _ := stmt.Exec(c.GuildId, c.ChannelId, c.ChannelName, c.ChannelType)
-	id, _ := res.RowsAffected()
-
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Exec(c.GuildId, c.ChannelId, c.ChannelName, c.ChannelType)
+		id, _ = res.RowsAffected()
+		stmt.Close()
+	}
+	defer db.Close()
 	return int(id)
 }
 
 // 채널 아이디로 채널 이름 조회
 func SelectChannelNameById(chnnelId string) string {
 	db := dbConn()
-	sql := `SELECT channelName
-			FROM channel
-			WHERE channelId = ?`
-	stmt, _ := db.Prepare(sql)
-
+	err := db.Ping()
 	var channelName string
-	stmt.QueryRow(chnnelId).Scan(&channelName)
+	if err == nil {
+
+		db := dbConn()
+		sql := `SELECT channelName
+				FROM channel
+				WHERE channelId = ?`
+		stmt, _ := db.Prepare(sql)
+
+		stmt.QueryRow(chnnelId).Scan(&channelName)
+		stmt.Close()
+	}
+	defer db.Close()
 	return channelName
 }
 
-// 채널 아이디로 채널 이름 조회
+// 채널 아이디로 채널 타입 조회
 func SelectChannelTypeById(channelId string) string {
 	db := dbConn()
-	sql := `SELECT channelType
-			FROM channel
-			WHERE channelId = ?`
-	stmt, _ := db.Prepare(sql)
-
+	err := db.Ping()
 	var channelType string
-	stmt.QueryRow(channelId).Scan(&channelType)
+	if err == nil {
+		sql := `SELECT channelType
+		FROM channel
+		WHERE channelId = ?`
+		stmt, _ := db.Prepare(sql)
+
+		stmt.QueryRow(channelId).Scan(&channelType)
+		stmt.Close()
+	}
+	defer db.Close()
 	return channelType
 }
 
 // 채널 타입 변경
 func UpdateChannelType(channelId string, channelType string) int {
 	db := dbConn()
-	sql := `UPDATE channel SET channelType = ?
-	WHERE channelId = ?`
+	err := db.Ping()
+	var cnt int64
+	if err == nil {
+		sql := `UPDATE channel SET channelType = ?
+		WHERE channelId = ?`
 
-	stmt, _ := db.Prepare(sql)
-	res, _ := stmt.Exec(channelType, channelId)
-	cnt, _ := res.RowsAffected()
-
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Exec(channelType, channelId)
+		cnt, _ = res.RowsAffected()
+		stmt.Close()
+	}
+	defer db.Close()
 	return int(cnt)
 }
