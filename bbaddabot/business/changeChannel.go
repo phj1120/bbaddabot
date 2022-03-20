@@ -17,7 +17,6 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 
 	// 유저가 없는 경우 유저 추가
 	userNum, err := ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
-
 	if err != nil {
 		user := ds.User{}
 		user.UserId = v.UserID
@@ -29,6 +28,8 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 		userNum, _ = ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
 	}
 	h.UserNum = userNum
+
+	// UserNum 으로 User 조회
 	user, err := ps.SelectUserByUserNum(h.UserNum)
 	userName := user.UserName
 
@@ -36,7 +37,7 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 	if v.BeforeUpdate != nil && v.VoiceState != nil {
 		// 동일 채널일 경우 처리할 것 없음
 		if v.BeforeUpdate.ChannelID == v.VoiceState.ChannelID {
-			return "err"
+			return "!change user state in same channel"
 		}
 		// 이전 채널이 있는 경우 - 퇴장, 타채널로 이동
 		if v.BeforeUpdate.ChannelID != "" {
@@ -57,7 +58,9 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 		// 이동 기록 삽입
 		_, err := ps.InsertHistory(h)
 		if err != nil {
-			return "err"
+			msg = fmt.Sprintf("%s%#v", "!insert user error - 이동, 종료", h)
+			fmt.Println(msg)
+			return msg
 		}
 
 		// 채널에 있었던 시간(분) 계산
@@ -79,13 +82,16 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 
 	// 이전 채널이 없는 경우 - 입장
 	if v.BeforeUpdate == nil {
+		h.AfterChannelId = v.ChannelID
+		h.HistoryType = "start"
 		afterChannelName := ps.SelectChannelNameById(v.ChannelID)
 		subMsg = fmt.Sprintf("%s%s", " / 입장 : ", afterChannelName)
 
 		// 이동 기록 삽입
 		_, err := ps.InsertHistory(h)
 		if err != nil {
-			return "err"
+			msg = fmt.Sprintf("%s%#v", "!insert user error - 입장", h)
+			fmt.Println(msg)
 		}
 		msg = fmt.Sprintf("%s%s%s%s", time.Now().Format("20060102 15:04:05"), " ", userName, subMsg)
 	}
