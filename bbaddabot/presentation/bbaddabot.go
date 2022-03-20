@@ -19,7 +19,7 @@ func PresentationTest() {
 	// business.ChangeChannel()
 }
 
-func main() {
+func Bbaddabot() {
 	token := os.Getenv("BBADDABOTTOKEN")
 
 	// Create a new Discord session using the provided bot token.

@@ -20,7 +20,7 @@ create table history(
     historyType varchar(20),
     
     primary key (`no`),
-    foreign key (userNum) references user(userNum)
+    foreign key (userNum) references user(userNum) ON DELETE CASCADE
 );
 
 create table studyTotal(
@@ -30,7 +30,7 @@ create table studyTotal(
     date datetime not null,
     
     primary key (no),
-    foreign key (userNum) references user(userNum)
+    foreign key (userNum) references user(userNum) ON DELETE CASCADE
 );
 
 create table channel(

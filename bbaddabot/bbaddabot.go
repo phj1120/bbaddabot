@@ -31,7 +31,6 @@ func main() {
 
 	dg.AddHandler(messageCreate)
 	dg.AddHandler(vociceStatusUpdate)
-	// dg.AddHandler(threadUpdate)
 
 	// We need information about guilds (which includes their channels),
 	// messages and voice states.
@@ -79,6 +78,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if strs == "!test" {
 		PresentationTest()
+		// business.ThrowOut(s, 3)
 	}
 
 	// if slice[0] == "!강퇴" {
@@ -110,23 +110,4 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// msg := fmt.Sprintf("%s %s %s %s", m.Timestamp.Format("20060102 15:04:05"), currntChannelName, m.Author.Username, m.Content)
 	// s.ChannelMessageSend("952040735090294804", msg)
 	// fmt.Println(msg)
-}
-
-// 기타 기능
-// 채널 편집 시 이벤트 발생
-func channelUpdate(s *discordgo.Session, c *discordgo.ChannelUpdate) {
-	msg := c.ID
-	log(s, msg)
-}
-
-// 스레드.. 텍스트 메시지 관련된것 같은데 잘 모르겠네
-func threadUpdate(s *discordgo.Session, t *discordgo.ThreadUpdate) {
-	msg := t.Channel.ID
-	log(s, msg)
-}
-
-// 재접속일 줄 알았는데 내가 원하는 재접속은 아니었음
-func presenceUpdate(s *discordgo.Session, p *discordgo.PresenceUpdate) {
-	msg := p.User
-	log(s, msg.ID)
 }
