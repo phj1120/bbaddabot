@@ -44,6 +44,25 @@ func SelectStudyTotalTodayByUserNum(userNum int) (int, error) {
 	return studyTime, err
 }
 
+func SelectStudyTotalToday(userId string, guildId string) (int, error) {
+	db := dbConn()
+	err := db.Ping()
+	var studyTime int
+	if err == nil {
+		sql := `select studytime from bbaddabot.studyTotal
+		WHERE date =DATE(NOW()) and 
+		usernum = (select usernum from user 
+			where userid=? and guildid = ?)`
+
+		stmt, _ := db.Prepare(sql)
+		err = stmt.QueryRow(userId, guildId).Scan(&studyTime)
+		stmt.Close()
+	}
+	defer db.Close()
+	return studyTime, err
+
+}
+
 // 공부 시간 업데이트 후 영향 받은 행 개수 반환
 func UpdateStudyTimeByUserNumAndStudyTime(userNum int, studyTime int) int {
 	db := dbConn()

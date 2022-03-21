@@ -72,6 +72,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	business.Chatbot(s, m)
+
 	// 강퇴 성공
 	strs := m.Content
 	// slice := strings.Split(strs, "=")

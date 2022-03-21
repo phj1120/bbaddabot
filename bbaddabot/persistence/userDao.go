@@ -58,6 +58,22 @@ func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error)
 	return int(userNum), err
 }
 
+func SelectBbadda(userNum int) (int, error) {
+	db := dbConn()
+	err := db.Ping()
+	var bbadda int64
+	if err == nil {
+		sql := `SELECT bbadda
+		FROM user WHERE userNum = ?`
+		stmt, _ := db.Prepare(sql)
+		err = stmt.QueryRow(userNum).Scan(&userNum)
+		stmt.Close()
+	}
+	defer db.Close()
+	db.Close()
+	return int(bbadda), err
+}
+
 func SelectOverBbadaa(guildId string, bbaddaLimit int) ([]ds.User, error) {
 	db := dbConn()
 	err := db.Ping()
@@ -67,6 +83,26 @@ func SelectOverBbadaa(guildId string, bbaddaLimit int) ([]ds.User, error) {
 		sql := `select * from user where guildId = ? and bbadda > ?`
 		stmt, _ := db.Prepare(sql)
 		res, _ := stmt.Query(guildId, bbaddaLimit)
+
+		for res.Next() {
+			res.Scan(&user.UserNum, &user.UserId, &user.GuildId, &user.UserName, &user.Bbadda, &user.UserType)
+			users = append(users, user)
+		}
+		stmt.Close()
+	}
+	defer db.Close()
+	return users, err
+}
+
+func SelectUserList(guildId string) ([]ds.User, error) {
+	db := dbConn()
+	err := db.Ping()
+	var user ds.User
+	var users []ds.User
+	if err == nil {
+		sql := `select * from user where guildId = ?`
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Query(guildId)
 
 		for res.Next() {
 			res.Scan(&user.UserNum, &user.UserId, &user.GuildId, &user.UserName, &user.Bbadda, &user.UserType)
