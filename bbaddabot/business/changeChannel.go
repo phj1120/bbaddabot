@@ -68,7 +68,7 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 		spentMinute := ps.SelectMinuteSpentChannel2(userNum)
 
 		// 공부 기록인 경우 총합 공부 시간 갱신
-		if h.HistoryType == "study" {
+		if h.HistoryType == "공부" {
 			// 총 공부 시간
 			_, err := ps.SelectStudyTotalTodayByUserNum(h.UserNum)
 			if err != nil {

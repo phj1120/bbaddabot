@@ -34,7 +34,7 @@ func HistoryDaoTest() {
 	history.UserNum = 1
 	history.BeforeChannelId = "951672059010879499"
 	history.AfterChannelId = "951672831312289883"
-	history.HistoryType = "study"
+	history.HistoryType = "공부"
 	cnt, _ := persistence.InsertHistory(history)
 	fmt.Println(cnt)
 
