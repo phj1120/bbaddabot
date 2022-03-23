@@ -27,17 +27,17 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		for _, user = range userList {
 			bbadda, _ = ps.SelectBbadda(user.UserNum)
 			studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
-			subMsg = fmt.Sprintf("%s : 총 %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
+			subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
 			msg += subMsg
 		}
 	}
 
 	if request == "!빠따" {
-		msg = fmt.Sprintf("[%s] %s : 총 %d 개", time.Now().Format("20060102 15:04"), user.UserName, bbadda)
+		msg = fmt.Sprintf("[%s] %s : %d 개", time.Now().Format("20060102 15:04"), user.UserName, bbadda)
 	}
 
 	if request == "!공부시간" {
-		msg = fmt.Sprintf("[%s] %s : 총 %s", time.Now().Format("20060102 15:04"), user.UserName, minuteToHour(studyTime))
+		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("20060102 15:04"), user.UserName, minuteToHour(studyTime))
 	}
 
 	s.ChannelMessageSend(m.ChannelID, msg)

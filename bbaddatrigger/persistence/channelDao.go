@@ -64,6 +64,23 @@ func SelectChannelTypeById(channelId string) string {
 	return channelType
 }
 
+// 길드별 알림 채널 조회
+func SelectNotiyChannel(guildId string) string {
+	db := dbConn()
+	err := db.Ping()
+	var noityChannel string
+	if err == nil {
+		sql := `SELECT channelId
+		FROM channel
+		WHERE channeltype = '알림' and guildId = ?`
+		stmt, _ := db.Prepare(sql)
+		stmt.QueryRow(guildId).Scan(&noityChannel)
+		stmt.Close()
+	}
+	defer db.Close()
+	return noityChannel
+}
+
 // 채널 타입 변경
 func UpdateChannelType(channelId string, channelType string) int {
 	db := dbConn()
