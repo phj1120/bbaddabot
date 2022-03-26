@@ -66,7 +66,7 @@ func SelectBbadda(userNum int) (int, error) {
 		sql := `SELECT bbadda
 		FROM user WHERE userNum = ?`
 		stmt, _ := db.Prepare(sql)
-		err = stmt.QueryRow(userNum).Scan(&userNum)
+		err = stmt.QueryRow(userNum).Scan(&bbadda)
 		stmt.Close()
 	}
 	defer db.Close()
@@ -153,18 +153,17 @@ func UpdateUserType(u ds.User) (*int64, error) {
 }
 
 // 빠따 카운트 + 1
-func UpdateUserBbaddaByUserId(userId string) (*int64, error) {
+func UpdateBbaddaByUserNum(userNum int) (*int64, error) {
 	db := dbConn()
 	err := db.Ping()
 	var no int64
 	if err == nil {
 		sql := `UPDATE user SET bbadda = bbadda+1
-		WHERE userId = ?`
+		WHERE userNum = ?`
 
 		stmt, _ := db.Prepare(sql)
-		res, _ := stmt.Exec(userId)
+		res, _ := stmt.Exec(userNum)
 
-		// auto_increment 반환
 		no, err = res.RowsAffected()
 		stmt.Close()
 	}

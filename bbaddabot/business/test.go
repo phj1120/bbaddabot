@@ -25,7 +25,6 @@ func UserDaoTest() {
 	user2, _ := persistence.SelectUserByUserNum(userNum)
 	fmt.Println(user2)
 
-	persistence.UpdateUserBbaddaByUserId(user.UserId)
 }
 
 func HistoryDaoTest() {
