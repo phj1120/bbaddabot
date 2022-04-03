@@ -53,31 +53,8 @@ func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 	return historys
 }
 
-// 혼자쓰면 이렇게 가능한데
-// 여러명 동시에 사용하는거 고려하면 이거만으로는 안된다..
-// 이번 해당 history 를 기준으로 채널에 있었던 분 확인
-//
-func SelectMinuteSpentChannel(historyNo int) int {
-	db := dbConn()
-	err := db.Ping()
-	var studyTime int
-	if err == nil {
-		sql := `SELECT TIMESTAMPDIFF(MINUTE,
-			(SELECT time FROM history
-			WHERE no = ? -1),
-			(SELECT time FROM history
-			WHERE no = ?
-			))`
-		stmt, _ := db.Prepare(sql)
-		stmt.QueryRow(historyNo, historyNo).Scan(&studyTime)
-		stmt.Close()
-	}
-	defer db.Close()
-	return studyTime
-}
-
 // UserNum 을 받아서 최신의 값 2개만 가져오고 그 값으로 비교해보자.
-func SelectMinuteSpentChannel2(userNum int) int {
+func SelectMinuteSpentByUserNum(userNum int) int {
 	db := dbConn()
 	err := db.Ping()
 	var studyTime int

@@ -41,7 +41,7 @@ func HistoryDaoTest() {
 	fmt.Println(historys)
 
 	fmt.Println("SelectMinuteSpentChannel")
-	spentMinute := persistence.SelectMinuteSpentChannel(cnt)
+	spentMinute := persistence.SelectMinuteSpentByUserNum(cnt)
 	fmt.Println(spentMinute)
 }
 
