@@ -82,11 +82,11 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 			} else {
 				ps.UpdateStudyTimeByUserNumAndStudyTime(h.UserNum, spentMinute)
 			}
-			msg = fmt.Sprintf("| %s | %s %s | %d 분 / %s | %s |", time.Now().Format("20060102 15:04:05"), userName, h.HistoryType, spentMinute, minuteToHour(totalStudyTime+spentMinute), subMsg)
+			msg = fmt.Sprintf("| %s | %s %s | %s / %s | %s |", time.Now().Format("20060102 15:04:05"), userName, h.HistoryType, minuteToHour(spentMinute), minuteToHour(totalStudyTime+spentMinute), subMsg)
 			subMsg = fmt.Sprintf("[ %s ] %s : %s / %s", time.Now().Format("20060102 15:04"), userName, minuteToHour(spentMinute), minuteToHour(totalStudyTime+spentMinute))
 			s.ChannelMessageSend("955079135338856459", subMsg)
 		} else {
-			msg = fmt.Sprintf("| %s | %s %s | %d 분 | %s |", time.Now().Format("20060102 15:04:05"), userName, h.HistoryType, spentMinute, subMsg)
+			msg = fmt.Sprintf("| %s | %s %s | %s | %s |", time.Now().Format("20060102 15:04:05"), userName, h.HistoryType, minuteToHour(spentMinute), subMsg)
 		}
 	}
 
@@ -106,7 +106,7 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 			msg = fmt.Sprintf("%s%#v", "!insert user error - 입장", h)
 			fmt.Println(msg)
 		}
-		msg = fmt.Sprintf("%s%s%s%s", time.Now().Format("20060102 15:04:05"), " ", userName, subMsg)
+		msg = fmt.Sprintf("| %s | %s | %s |", time.Now().Format("20060102 15:04:05"), userName, subMsg)
 	}
 
 	return msg
