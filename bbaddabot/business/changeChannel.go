@@ -83,8 +83,10 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 				ps.UpdateStudyTimeByUserNumAndStudyTime(h.UserNum, spentMinute)
 			}
 			msg = fmt.Sprintf("| %s | %s %s | %s / %s | %s |", time.Now().Format("20060102 15:04:05"), userName, h.HistoryType, minuteToHour(spentMinute), minuteToHour(totalStudyTime+spentMinute), subMsg)
-			subMsg = fmt.Sprintf("[ %s ] %s : %s / %s", time.Now().Format("20060102 15:04"), userName, minuteToHour(spentMinute), minuteToHour(totalStudyTime+spentMinute))
-			s.ChannelMessageSend("955079135338856459", subMsg)
+			if spentMinute > 10 {
+				subMsg = fmt.Sprintf("[ %s ] %s : %s / %s", time.Now().Format("20060102 15:04"), userName, minuteToHour(spentMinute), minuteToHour(totalStudyTime+spentMinute))
+				s.ChannelMessageSend("955079135338856459", subMsg)
+			}
 		} else {
 			msg = fmt.Sprintf("| %s | %s %s | %s | %s |", time.Now().Format("20060102 15:04:05"), userName, h.HistoryType, minuteToHour(spentMinute), subMsg)
 		}
