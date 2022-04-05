@@ -20,7 +20,7 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	var msg string
 	var subMsg string
-	if request == "!기록" {
+	if request == "!기록" || request == "!ㄱㄹ" {
 		userList, _ := ps.SelectUserList(m.GuildID)
 
 		msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
@@ -36,7 +36,7 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		msg = fmt.Sprintf("[%s] %s : %d 개", time.Now().Format("20060102 15:04"), user.UserName, bbadda)
 	}
 
-	if request == "!공부시간" {
+	if request == "!공부시간" || request == "!ㄱㅄㄱ" {
 		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("20060102 15:04"), user.UserName, minuteToHour(studyTime))
 	}
 
