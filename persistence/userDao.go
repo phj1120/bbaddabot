@@ -80,7 +80,7 @@ func SelectOverBbadaa(guildId string, bbaddaLimit int) ([]ds.User, error) {
 	var user ds.User
 	var users []ds.User
 	if err == nil {
-		sql := `select * from user where guildId = ? and bbadda > ?`
+		sql := `select userNum, userId, guildId, userName, bbadda, userType from user where guildId = ? and bbadda > ?`
 		stmt, _ := db.Prepare(sql)
 		res, _ := stmt.Query(guildId, bbaddaLimit)
 
@@ -100,7 +100,7 @@ func SelectUserList(guildId string) ([]ds.User, error) {
 	var user ds.User
 	var users []ds.User
 	if err == nil {
-		sql := `select * from user where guildId = ?`
+		sql := `select userNum, userId, guildId, userName, bbadda, userType from user where guildId = ?`
 		stmt, _ := db.Prepare(sql)
 		res, _ := stmt.Query(guildId)
 

@@ -56,6 +56,19 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+	// 강퇴 기능 추가 중
+	// slice := strings.Split(request, ".")
+	// fmt.Println(slice)
+	// if slice[0] == "!강퇴" {
+	// 	user, _ := persistence.SelectUserByUserNum(userNum)
+	// 	if slice[1] == user.UserName {
+	// 		fmt.Println(m.GuildID)
+	// 		fmt.Println(user.UserId)
+	// 		err := s.GuildMemberDeleteWithReason(m.GuildID, user.UserId, "빠따 초과")
+	// 		fmt.Println(err)
+	// 	}
+	// }
+
 	s.ChannelMessageSend(m.ChannelID, msg)
 
 }
