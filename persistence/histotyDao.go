@@ -35,7 +35,7 @@ func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 	var historys []ds.History
 	if err == nil {
 
-		sql := `SELECT *
+		sql := `SELECT no, username, beforechannelid, afterchannelid, time 
 		FROM history
 		WHERE userNum = ? AND DATE(time) = DATE(NOW())`
 		stmt, _ := db.Prepare(sql)
@@ -44,7 +44,7 @@ func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 		var history ds.History
 
 		for res.Next() {
-			res.Scan(&history.No, &history.UserNum, &history.BeforeChannelId, &history.AfterChannelId, &history.Time, &history.Time)
+			res.Scan(&history.No, &history.UserNum, &history.BeforeChannelId, &history.AfterChannelId, &history.Time)
 			historys = append(historys, history)
 		}
 		stmt.Close()

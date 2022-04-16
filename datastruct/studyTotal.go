@@ -5,8 +5,10 @@ import (
 )
 
 type StudyTotal struct {
-	No         int
-	UserNum    int
-	Study_time int
-	Date       time.Time
+	No             int
+	UserNum        int
+	StudyTime      int
+	Date           time.Time
+	TodaySuccess   bool
+	WeekSuccessCnt int
 }

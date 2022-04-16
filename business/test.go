@@ -17,12 +17,12 @@ func UserDaoTest() {
 	user.Bbadda = 0
 	user.UserType = "overseer"
 
-	persistence.InsertUser(user)
+	persistence.UserSave(user)
 
 	userNum, _ := persistence.SelectUserNumByUserIdAndGuildId(user.UserId, user.GuildId)
 	fmt.Println(userNum)
 
-	user2, _ := persistence.SelectUserByUserNum(userNum)
+	user2, _ := persistence.UserFindByUserNum(userNum)
 	fmt.Println(user2)
 
 }
@@ -49,7 +49,7 @@ func StudyTotalDaoTest() {
 	fmt.Println("StudyTotalDaoTest")
 	studyTotal := ds.StudyTotal{}
 	studyTotal.UserNum = 1
-	studyTotal.Study_time = 0
+	studyTotal.StudyTime = 0
 	studyTotal.Date = time.Now()
 
 	fmt.Print("SelectStudyTotalTodayByUserNum")
@@ -58,7 +58,7 @@ func StudyTotalDaoTest() {
 	// 오늘 공부가 처음이면 오늘 기록 새로 생성 및 조회
 	if err != nil {
 		fmt.Println("InsertNewStudyTotal ")
-		id := persistence.InsertNewStudyTotal(studyTotal.UserNum, studyTotal.Study_time)
+		id := persistence.InsertNewStudyTotal(studyTotal.UserNum, studyTotal.StudyTime)
 		fmt.Println(id)
 		studyTime, _ = persistence.SelectStudyTotalTodayByUserNum(studyTotal.UserNum)
 	}

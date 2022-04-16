@@ -14,46 +14,26 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	request := m.Content
 
 	userNum, _ := ps.SelectUserNumByUserIdAndGuildId(m.Author.ID, m.GuildID)
-	bbadda, _ := ps.SelectBbadda(userNum)
-	user, _ := ps.SelectUserByUserNum(userNum)
+	// bbadda, _ := ps.SelectBbadda(userNum)
+	user, _ := ps.UserFindByUserNum(userNum)
 	studyTime, _ := ps.SelectStudyTotalTodayByUserNum(userNum)
 
 	var msg string
 	var subMsg string
 	if request == "!기록" || request == "!ㄱㄹ" {
-		userList, _ := ps.SelectUserList(m.GuildID)
-
+		userList, _ := ps.UserListFindByGuildId(m.GuildID)
 		msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
 		for _, user = range userList {
-			bbadda, _ = ps.SelectBbadda(user.UserNum)
+			// bbadda, _ = ps.SelectBbadda(user.UserNum)
 			studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
-			subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
+			subMsg = fmt.Sprintf("%s : %s\n", user.UserName, minuteToHour(studyTime))
+			// subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
 			msg += subMsg
 		}
-	}
-
-	if request == "!빠따" {
-		msg = fmt.Sprintf("[%s] %s : %d 개", time.Now().Format("20060102 15:04"), user.UserName, bbadda)
 	}
 
 	if request == "!공부시간" || request == "!ㄱㅄㄱ" {
 		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("20060102 15:04"), user.UserName, minuteToHour(studyTime))
-	}
-
-	if request == "!정산" {
-		userList, _ := ps.SelectUserList(m.GuildID)
-
-		msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
-		for _, user = range userList {
-			bbadda, _ = ps.SelectBbadda(user.UserNum)
-			studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
-			if studyTime <= 180 {
-				ps.UpdateBbaddaByUserNum(user.UserNum)
-				bbadda, _ = ps.SelectBbadda(user.UserNum)
-			}
-			subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
-			msg += subMsg
-		}
 	}
 
 	// 강퇴 기능 추가 중
@@ -69,6 +49,26 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// 	}
 	// }
 
+	// Todo - 빠따 삭제로 관련 기능 삭제
+	// if request == "!빠따" {
+	// 	msg = fmt.Sprintf("[%s] %s : %d 개", time.Now().Format("20060102 15:04"), user.UserName, bbadda)
+	// }
+	//
+	// if request == "!정산" {
+	// 	userList, _ := ps.SelectUserList(m.GuildID)
+	//
+	// 	msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
+	// 	for _, user = range userList {
+	// 		bbadda, _ = ps.SelectBbadda(user.UserNum)
+	// 		studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
+	// 		if studyTime <= 180 {
+	// 			ps.UpdateBbaddaByUserNum(user.UserNum)
+	// 			bbadda, _ = ps.SelectBbadda(user.UserNum)
+	// 		}
+	// 		subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
+	// 		msg += subMsg
+	// 	}
+	// }
 	s.ChannelMessageSend(m.ChannelID, msg)
 
 }

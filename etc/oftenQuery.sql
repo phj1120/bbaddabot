@@ -40,3 +40,16 @@ DATE_FORMAT(DATE_SUB(`date`, INTERVAL (DAYOFWEEK(`date`)-1) DAY), '%Y/%m/%d') as
 DATE_FORMAT(DATE_SUB(`date`, INTERVAL (DAYOFWEEK(`date`)-7) DAY), '%Y/%m/%d') as end, 
 DATE_FORMAT(`date`, '%Y%U') AS `date`, sum(`studyTime`)  as weekStudy
 FROM bbaddabot.studyTotal GROUP BY userNum;
+
+# 열 삭제
+alter table bbaddabot.studytotal drop column todaySuccess;
+alter table bbaddabot.user drop column wantTime;
+alter table bbaddabot.user drop column  wantCnt;
+
+# 열 추가
+alter table bbaddabot.user add wantTime int default 180;
+alter table bbaddabot.user add  wantCnt int default 5;
+
+alter table bbaddabot.studytotal add todaySuccess boolean default false;
+alter table bbaddabot.studytotal add weekSuccessCnt int default 0;
+

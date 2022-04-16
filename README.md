@@ -1,27 +1,29 @@
 # 디스코드 공부 시간 관리 봇
+
 ## 프로젝트 설명
 
 스터디 인원 관리를 위한 봇
 
-각자 목표를 정해서 (하루 n 시간 씩 일주일에 m 번) 
+각자 목표를 정해서 (하루 n 시간 씩 일주일에 m 번)
 
 이를 지키지 못한 사람은 스터디에서 강퇴
 
-
 ## 규칙
+
 목표 공부 시간을 달성하지 못하면 빠따 적립
 
 n 빠따 이상 적립 될 경우 퇴장
 
-* 초기에는 모두에게 동일한 기준을 적용하고 빠따라는 점수를 가지고 일정 점수 이상인 사람을 강퇴 하려 했으나 개인별, 주 단위로 하는 것이 좋을 것 같다는 의견을 받아 추후 수정 예정
-
+- 초기에는 모두에게 동일한 기준을 적용하고 빠따라는 점수를 가지고 일정 점수 이상인 사람을 강퇴 하려 했으나 개인별, 주 단위로 하는 것이 좋을 것 같다는 의견을 받아 추후 수정 예정
 
 ## 사용법
 
 ### 봇 초대
+
 https://discord.com/oauth2/authorize?client_id=951796816016445464&permissions=8&scope=bot
 
 ### 초기 설정 (추후 추가 예정, 현재 : DB에 직접 추가)
+
 ```
 !설정.알림 : 특정 시간에 알림이 올 채널으로 지정(채팅 채널)
 
@@ -33,8 +35,9 @@ https://discord.com/oauth2/authorize?client_id=951796816016445464&permissions=8&
 ```
 
 ### 정보 확인
+
 ```
-!기록 : 전체 인원 
+!기록 : 전체 인원
 
 !공부시간 : 본인 공부 시간 확인
 
@@ -42,6 +45,7 @@ https://discord.com/oauth2/authorize?client_id=951796816016445464&permissions=8&
 ```
 
 ### 규칙
+
 ```
 // 빠따 계산
 if 하루 공부시간 < n
@@ -51,11 +55,12 @@ else if 하루 공부시간 >= n && 빠따 > 0
    빠따 -= 1
 
 // 빠따 정산 ( 매일 0 시 )
-if 빠따 > k 
+if 빠따 > k
    추방
 ```
 
-###  기준
+### 기준
+
 ```
 하루 = 0 ~ 24 시
 
@@ -63,12 +68,14 @@ if 빠따 > k
 ```
 
 ### 기타
+
 ```
-채널 이동 할 때마다 시간 기록 되는 거라 기준시간(00시) 전에 
+채널 이동 할 때마다 시간 기록 되는 거라 기준시간(00시) 전에
 한 번 왔다 갔다 해줘야 오늘 기록에 인정, 아니면 다음날에 기록 됨
 ```
 
 ### 추후 수정 사항
+
 ```
 공부 시간, 횟수 기준 변경 (일간, 통합 -> 주간, 개인별)
 
@@ -76,6 +83,7 @@ if 빠따 > k
 ```
 
 ### 개발 계획
+
 ```
 추가 되면 좋겠다 싶은 아이디어, 사용 중 버그 제보 받음
 
@@ -85,35 +93,43 @@ if 빠따 > k
 ## 개발 과정
 
 ### 환경 구성
-*  필요 모듈 다운로드
+
+- 필요 모듈 다운로드
+
 ```
 go mod tidy
 ```
 
-* 실행
+- 실행
+
 ```
 go run .
 ```
 
 ### 참고 자료
+
 Go
-* https://go.dev/doc/tutorial/getting-started
+
+- https://go.dev/doc/tutorial/getting-started
 
 Discordgo
-* https://pkg.go.dev/github.com/bwmarrin/discordgo#section-readme
+
+- https://pkg.go.dev/github.com/bwmarrin/discordgo#section-readme
 
 Go layered Arcitecture
-* https://github.com/ruslantsyganok/clean_arcitecture_golang_example
 
+- https://github.com/ruslantsyganok/clean_arcitecture_golang_example
 
 ### 기록
+
 https://parkhj.notion.site/da3f8fe5a214450386461b4e2f7f33e6
 
 #### 2022.03.16.
+
 ```
 금방 끝날 줄 알았는데 점점 길어짐
 요구사항 분석, 설계를 어느 정도 했다 생각했는데 부족한 부분들이 있었다.
-일단 코드 부터 치지말고 
+일단 코드 부터 치지말고
 `비즈니스가 어떻게 진행되는지 말로 상세하게 적어보고 그 로직을 코드로 옮기기만 하면 될때 코딩 시작`하자.
 이때 Usecase 를 쓰는 건가?
 그래도 오늘 datasource와 persistence 를 어느정도 작성했기에 부족한 부분을 볼 수 있었음.
@@ -121,7 +137,9 @@ https://parkhj.notion.site/da3f8fe5a214450386461b4e2f7f33e6
 ```
 
 #### 2022.03.19.
-* 테이블 설계
+
+- 테이블 설계
+
 ```
 user(userNum, userId, guildId, userName, bbadda, type)
 	type{관리자, 사용자}
@@ -135,79 +153,81 @@ channel(no, guildId, channelId, channelName, type)
 	type{공부, 휴식}
 ```
 
-* 요구사항 분석
+- 요구사항 분석
+
 ```
 - 사용자 음성 채팅방 이동 → 사용자 상태 업데이트 됐다는 신호 발생
-        
+
     1. 이전 채널이 없는 경우 입장으로 판단
-    
+
         이전 채널의 타입이 휴식인 경우 : 휴식 시작(기록 업데이트)
-        
+
         이전 채널의 타입이 공부인 경우 : 공부 시작(기록 업데이트)
-    
+
     2.이전 채널, 변경된 채널 모두 존재하면 채널 변경으로 판단
-    
+
         이전 채널 타입이 공부
-        
+
         이후 채널 타입이 공부 → 공부로 판단 : 공부 완료 (기록, 총 공부 시간 업데이트)
-        
+
         이후 채널 타입이 휴식 → 공부로 판단 : 공부 완료, 총 공부 시간 업데이트
-        
+
         이전 채널 타입이 휴식
-        
+
         이후 채널 타입이 공부 → 휴식으로 판단 : 기록 업데이트 (휴식 완료)
-        
+
         이후 채널 타입이 휴식 → 휴식으로 판단 : 기록 업데이트 (휴식 완료)
-        
+
         3.이후 채널이 없는 경우 퇴장으로 판단
-        
+
         이전 채널의 타입이 휴식인 경우 : 기록 업데이트(휴식 완료)
-        
-        이전 채널의 타입이 공부인 경우 :  기록 업데이트(공부 완료), 총 공부 시간 업데이트 
+
+        이전 채널의 타입이 공부인 경우 :  기록 업데이트(공부 완료), 총 공부 시간 업데이트
 
     변경이 발생할 때마다 기록
-    
+
     이전 채널이 있는 경우 이전 채널의 타입으로 공부, 휴식 시간 구분
-    
+
     DB 의 이전 row 에서 시간을 가져와 활동 시간 계산
-    
+
     → 대략적인 정보 log 채널에 전송
-    
+
     해당 활동이 공부 일 경우 총 공부 시간 업데이트
 
 
 - 특정 시간에 하루 공부 할당량 확인
-    
+
     → 빠따 계산(못 채운 사람 빠따 + 1 / 채운 사람 빠따 -1)
-    
+
     → 빠따 정산(빠따가 n 초과 인 경우 강퇴 / 최소 빠따 0, 최대 빠따 n)
-    
+
 
 - 사용자 입력
-    
+
     !공부시간 → 총 공부 시간 알림
-    
-    !빠따 → 현재 빠따 수 알림 
-    
+
+    !빠따 → 현재 빠따 수 알림
+
     !기록 → 현재 길드원들 빠따 수, 공부 시간 알림
-    
+
 - 관리자 입력
-    
+
     !설정.휴식채널=채널ID → 해당 채널 휴식 채널로 지정
-    
+
     !설정.공부채널=채널ID → 해당 채널 공부 채널로 지정
-    
+
     !설정.관리자.지정=유저ID
-    
+
     !설정.관리자.해제=유저ID
 ```
 
-* 계층 구조
+- 계층 구조
+
 ```
 * Datastruct
     - 각 DB 테이블 속성에 매칭되는 struct
 
-    - channel / history / studyTotal / user 
+    - channel / history / studyTotal / user
 
 * persistence
     - DB 에 접근해 CRUD 하는 계층
@@ -227,14 +247,16 @@ channel(no, guildId, channelId, channelName, type)
     - bbaddabot
 ```
 
-* 수정 사항
+- 수정 사항
+
 ```
 채널 이동 시 상황에 맞게 상태 업데이트 하는 기능 buisness 계층으로 이동
 ```
 
 #### 2022.03.19
+
 ```
-Spring 강의를 듣는데 
+Spring 강의를 듣는데
 
 Repository - 순수 Data Access 기능
 
@@ -267,16 +289,17 @@ DTO - 계층간 데이터 공유
 
 그리고 Repository 와 Service 에서 어떤 기준으로 나눠야하는지에 대한 궁금증이 생겼다.
 
-쿼리로 가져오면 금방 가져올 것 같은데 
+쿼리로 가져오면 금방 가져올 것 같은데
 
 새로 DTO 와 Repository 를 만드는게 좋을까
 
 기존에 있는 메서드들로 Service 에서 값을 처리하는게 좋을까 모르겠다.
 
-좋은 코드들을 보면서 감을 익히고 싶다. 
+좋은 코드들을 보면서 감을 익히고 싶다.
 ```
 
 #### 2022.03.20.
+
 ```
 어제 예외처리 안한다고 판단했던게 오늘 돌아왔다.
 
@@ -290,7 +313,7 @@ DTO - 계층간 데이터 공유
 
 로그를 보면 sql.~~ 이라 되어있어 DB 문제라 생각하고 디버깅을 했다.
 
-라이브러리에 문서를 보니 
+라이브러리에 문서를 보니
 err = db.Ping()
 if err != nil {
     // do something here
@@ -301,7 +324,7 @@ if err != nil {
 
 오류 메시지로 Too Many Connection 이라는 메시지가 새로 생겼다.
 
-그래서 관련 되어 찾아보니 
+그래서 관련 되어 찾아보니
 
 connection 을 늘리거나 DB를 이용하고 난 후 close 를 하라고 나와있었다.
 
@@ -320,6 +343,7 @@ DAO 에 메서드마다 defer DB.close() 를 추가해줬다.
 ```
 
 #### 2022.03.23.
+
 ```
 일정 시간에 알림과 빠따 정산을 하기 위해 어떻게 구현할지 검색해 봤다.
 
@@ -336,4 +360,96 @@ DAO 에 메서드마다 defer DB.close() 를 추가해줬다.
 그래서 go의 crontab 관련 모듈을 사용해서 구현해 볼 예정이다.
 ```
 
+### 2022.04.16.
 
+```
+DB 구조 변경
+
+bbadda 삭제
+
+user(userNum, userId, guildId, userName, userType, wantTime, wantCnt)
+
+wantTime : 주간 목표 횟수
+
+wantCnt : 일별 목표 시간
+
+studyTotal(no, userNum, studyTime, date, todaySuccess, weekSuccessCnt)
+
+todaySuccess : 일간 목표 달성 여부
+
+weekSuccessCnt : 이번 주 일간 목표 달성 회 수
+
+월요일이면 weekSuccessCnt = 0 되도록.
+
+메소드 명명 규칙 JPA 처럼 변경 중
+
+selectUserByUserNum →
+
+UserFindByUserNum
+
+원래는 FindByUserNum 으로 해야하지만
+
+현재 persistance 파일만 다르지 같은 패키지로
+
+이름이 중복 될 수 없고, 구분이 안됨
+
+구조체를 만들어서 하면 구현 가능
+
+나는 쿼리문이 대부분 특정 속성을 가져오는 게 많음 그래서 findBy~ 로 바꿀게 얼마 없었음
+
+이렇게 하는게 맞는지 모르겠다
+
+DAO 에서는 findBy~ 로 가져오고
+
+Bussiness 에서 데이터를 가공했어야 되나.
+
+추후 변경 사항
+
+수정
+
+studyTotalDao.InsertNewStudyTotal
+
+오늘 공부 기록 추가할 때
+
+이번 주 처음 작성하는 경우
+
+weekSuccessCnt = 0
+
+이번 주 기록이 있는 경우
+
+가장 최근의 weekSuccessCnt  +1
+
+추가
+
+DB 기준으로 작성
+
+user.wantTime ≤ studyTotal.studyTime
+
+studyTotal.todaySuccess = false
+
+studyTotal.todaySuccess true로 변경
+
+studyTotal.weekSuccessCnt+1
+
+기준 시간 변경
+
+특정 시간에 정산
+
+챗봇 기능(길드별 로그 전송, 주 초반 개인 목표 변경 가능하도록)
+
+지금 코드가 똥이지만 진행을 할지 리팩터링 하고 진행을 할지 고민하는 갈팡질팡하는 중이다.
+
+디비도 갈아엎고 싶고 리팩토링도 하고 싶다.
+
+근데 내가 이걸 할 만큼 여유가 있는가? 스프링 프로젝트를 하는게 더 좋지 않을까
+
+→ 재밌으면 하는거지, 짬짬히 해야겠다.
+
+clean_arcitecture_golang_example 이거 이용해서 리팩터링을 한다면 하고
+
+일단 지금은 기능 구현부터 해야겠다.
+
+고민할 시간에 하나라도 더 해야지
+
+위의 기능 + 만 하면 당분간 기능적으로 더 구현할 것은 없는 듯
+```

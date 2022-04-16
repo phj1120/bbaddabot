@@ -27,14 +27,14 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) string {
 		user.GuildId = v.GuildID
 		userTmp, _ := s.User(v.UserID)
 		user.UserName = userTmp.Username
-		ps.InsertUser(user)
-		user, _ = ps.SelectUserByUserNum(h.UserNum)
+		ps.UserSave(user)
+		user, _ = ps.UserFindByUserNum(h.UserNum)
 		userNum, _ = ps.SelectUserNumByUserIdAndGuildId(v.UserID, v.GuildID)
 	}
 
 	h.UserNum = userNum
 	// UserNum 으로 User 조회
-	user, err := ps.SelectUserByUserNum(h.UserNum)
+	user, _ := ps.UserFindByUserNum(h.UserNum)
 	userName := user.UserName
 
 	// 채널간 이동이 발생한 경우
