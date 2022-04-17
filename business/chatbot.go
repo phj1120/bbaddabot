@@ -40,37 +40,43 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if strings.HasPrefix(request, "!설정") {
 		setting := strings.Split(request, " ")
 
-		switch {
-		// Set Channel Type
-		case strings.HasPrefix(setting[1], "채팅채널"):
+		if len(setting) <= 1 {
+			msg = "---------설정명령어---------\n"
+			msg += "!설정 채팅채널 : 채널 현재 설정상태 출력\n"
+			msg += "!설정 채팅채널 [채널타입] : 특정 채널 타입으로 설정"
+		} else {
+			switch {
+			// Set Channel Type
+			case strings.HasPrefix(setting[1], "채팅채널"):
 
-			// set channel type If there's flag after "채팅채널"
-			if len(setting) > 3 {
-				channelType := setting[2]
+				// set channel type If there's flag after "채팅채널"
+				if len(setting) >= 3 {
+					channelType := setting[2]
 
-				msg = "채널 설정 완료\n"
-				msg += "이전 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
-				msg += " 이전 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
+					msg = "---------채널 설정 완료---------\n"
+					msg += "이전 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
+					msg += " 이전 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
 
-				ps.UpdateChannelType(m.ChannelID, channelType) // Set channel type
+					ps.UpdateChannelType(m.ChannelID, channelType) // Set channel type
+				}
+
+				msg += "\n현재 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
+				msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
+
+				// Guide when no info in DB
+				/*
+					if ps.SelectChannelNameById(m.ChannelID) == "" || ps.SelectChannelTypeById(m.ChannelID) == "" {
+						msg += "\n채널 설정 정보가 없습니다. 채널을 설정해주십시오."
+						msg += "\n명령어: !설정 채팅채널 [채널타입]"
+					} else {
+						// show current channel type
+						msg += "\n현재 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
+						msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
+					}*/
+
+			case strings.HasPrefix(setting[1], "음성채널"):
+				msg = "기능준비중"
 			}
-
-			msg += "\n현재 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
-			msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
-
-			// Guide when no info in DB
-			/*
-				if ps.SelectChannelNameById(m.ChannelID) == "" || ps.SelectChannelTypeById(m.ChannelID) == "" {
-					msg += "\n채널 설정 정보가 없습니다. 채널을 설정해주십시오."
-					msg += "\n명령어: !설정 채팅채널 [채널타입]"
-				} else {
-					// show current channel type
-					msg += "\n현재 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
-					msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
-				}*/
-
-		case strings.HasPrefix(request, "음성채널"):
-			msg = "기능준비중"
 		}
 
 	}
