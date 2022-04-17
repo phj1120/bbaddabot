@@ -4,13 +4,13 @@ import (
 	_ "bbaddabot/datastruct"
 	ps "bbaddabot/persistence"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	request := m.Content
 
 	userNum, _ := ps.SelectUserNumByUserIdAndGuildId(m.Author.ID, m.GuildID)
@@ -34,6 +34,45 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if request == "!공부시간" || request == "!ㄱㅄㄱ" {
 		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("20060102 15:04"), user.UserName, minuteToHour(studyTime))
+	}
+
+	// Server setting command
+	if strings.HasPrefix(request, "!설정") {
+		setting := strings.Split(request, " ")
+
+		switch {
+		// Set Channel Type
+		case strings.HasPrefix(setting[1], "채팅채널"):
+
+			// set channel type If there's flag after "채팅채널"
+			if len(setting) > 3 {
+				channelType := setting[2]
+
+				msg = "채널 설정 완료\n"
+				msg += "이전 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
+				msg += " 이전 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
+
+				ps.UpdateChannelType(m.ChannelID, channelType) // Set channel type
+			}
+
+			msg += "\n현재 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
+			msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
+
+			// Guide when no info in DB
+			/*
+				if ps.SelectChannelNameById(m.ChannelID) == "" || ps.SelectChannelTypeById(m.ChannelID) == "" {
+					msg += "\n채널 설정 정보가 없습니다. 채널을 설정해주십시오."
+					msg += "\n명령어: !설정 채팅채널 [채널타입]"
+				} else {
+					// show current channel type
+					msg += "\n현재 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
+					msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
+				}*/
+
+		case strings.HasPrefix(request, "음성채널"):
+			msg = "기능준비중"
+		}
+
 	}
 
 	// 강퇴 기능 추가 중
