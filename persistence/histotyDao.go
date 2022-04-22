@@ -1,3 +1,14 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 박현준
+수정일 : 2022.04.22.
+
+파일 설명
+History(No, UserNum, BeforeChannelId, AfterChannelId, Time, HistoryType) 테이블 매핑
+*/
+
 package persistence
 
 import (
@@ -7,8 +18,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// no, username, before_channel, after_channel, time
-
 // history 삽입 후 auto_increment 반환
 func InsertHistory(h ds.History) (int, error) {
 	db := getConnection()
@@ -17,8 +26,6 @@ func InsertHistory(h ds.History) (int, error) {
 	if err == nil {
 		sql := `INSERT INTO  history (userNum, beforeChannelId, afterChannelId, time, historyType) 
 		VALUES(?, ?, ?, now(), ?)`
-		// msg := fmt.Sprintf("insert : %#v", h)
-		// fmt.Println(msg)
 		stmt, _ := db.Prepare(sql)
 		res, _ := stmt.Exec(h.UserNum, h.BeforeChannelId, h.AfterChannelId, h.HistoryType)
 		id, err = res.LastInsertId()
@@ -27,7 +34,7 @@ func InsertHistory(h ds.History) (int, error) {
 	return int(id), err
 }
 
-// 오늘 공부 기록 조회해 목록 반환
+// 당일 공부 history 목록 조회
 func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 	db := getConnection()
 	err := db.Ping()
@@ -39,7 +46,7 @@ func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 		WHERE userNum = ? AND DATE(time) = DATE(NOW())`
 		stmt, _ := db.Prepare(sql)
 		res, _ := stmt.Query(userNum)
-		var historys []ds.History
+
 		var history ds.History
 
 		for res.Next() {
@@ -51,7 +58,7 @@ func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 	return historys
 }
 
-// UserNum 을 받아서 최신의 값 2개만 가져오고 그 값으로 비교해보자.
+// 최근 채널에 머무른 시간 조회
 func SelectMinuteSpentByUserNum(userNum int) int {
 	db := getConnection()
 	err := db.Ping()

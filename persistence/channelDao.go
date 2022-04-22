@@ -1,3 +1,14 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 박현준
+수정일 : 2022.04.22.
+
+파일 설명
+Channel(No, GuildId, ChannelId, ChannelName, ChannelType) 테이블 매핑
+*/
+
 package persistence
 
 import (
@@ -5,8 +16,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-// guildId, channelId, channelName, channelType
 
 // 채널 추가
 func InsertChannel(c ds.Channel) int {
@@ -57,6 +66,29 @@ func SelectChannelTypeById(channelId string) string {
 		stmt.Close()
 	}
 	return channelType
+}
+
+// 채널 길드ID 와 채널 타입으로 채널 아이디 조회
+func SelectChannelIdByChannelTypeAndGuildId(channelType string, guildId string) []string {
+	db := getConnection()
+	err := db.Ping()
+	var channelIds []string
+	if err == nil {
+		sql := `SELECT channelId
+		FROM channel
+		WHERE channelType = ? and guildId = ?`
+		stmt, _ := db.Prepare(sql)
+		res, _ := stmt.Query(channelType, guildId)
+
+		var channelId string
+
+		for res.Next() {
+			res.Scan(&channelId)
+			channelIds = append(channelIds, channelId)
+		}
+		stmt.Close()
+	}
+	return channelIds
 }
 
 // 채널 타입 변경

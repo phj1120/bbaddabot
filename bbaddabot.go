@@ -1,3 +1,14 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 박현준
+수정일 : 2022.04.22.
+
+파일 설명
+이벤트 발생 시 상황에 맞는 buisness 호출
+*/
+
 package main
 
 import (
@@ -9,15 +20,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 )
-
-func PresentationTest() {
-	fmt.Println("PresentationTest")
-	// business.UserDaoTest()
-	// business.HistoryDaoTest()
-	// business.StudyTotalDaoTest()
-	business.ChannelTest()
-	// business.ChangeChannel()
-}
 
 func main() {
 	token := os.Getenv("BBADDABOTTOKEN")
@@ -52,64 +54,16 @@ func main() {
 	dg.Close()
 }
 
-func log(s *discordgo.Session, msg string) {
-	fmt.Println(msg)
-	s.ChannelMessageSend("954047325448335410", msg)
-}
-
 func vociceStatusUpdate(s *discordgo.Session, v *discordgo.VoiceStateUpdate) {
 	if v.VoiceState == nil {
 		return
 	}
-
-	msg := business.ChangeChannel(s, *v)
-	fmt.Println(msg)
-	s.ChannelMessageSend("952057033476177920", msg)
+	business.ChangeChannel(s, *v)
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-
 	business.Chatbot(s, m)
-
-	// 강퇴 성공
-	strs := m.Content
-	// slice := strings.Split(strs, "=")
-
-	if strs == "!test" {
-		PresentationTest()
-		// business.ThrowOut(s, 3)
-	}
-
-	// if slice[0] == "!강퇴" {
-	// 	s.GuildMemberDeleteWithReason(m.GuildID, slice[1], "강퇴")
-	// }
-
-	// // 제자리 이동 가능
-	// // !이동=759364130569584640.954049652003602452
-	// if slice[0] == "!이동" {
-	// 	tmp := strings.Split(slice[1], ".")
-	// 	s.GuildMemberMove(m.GuildID, tmp[0], &tmp[1])
-	// }
-
-	// // !채널=954049652003602452
-	// if slice[0] == "!채널" {
-	// 	guild, _ := s.State.Guild(m.GuildID)
-	// 	voices := guild.VoiceStates
-
-	// 	print(len(voices))
-	// 	// n := 0
-	// 	// for n < len(voices) {
-	// 	// 	log(s, voices[n].UserID)
-	// 	// }
-	// }
-
-	// 채팅 로그
-	// currntChannel, _ := s.Channel(m.ChannelID)
-	// currntChannelName := currntChannel.Name
-	// msg := fmt.Sprintf("%s %s %s %s", m.Timestamp.Format("20060102 15:04:05"), currntChannelName, m.Author.Username, m.Content)
-	// s.ChannelMessageSend("952040735090294804", msg)
-	// fmt.Println(msg)
 }

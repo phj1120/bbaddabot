@@ -1,3 +1,14 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 박현준
+수정일 : 2022.04.22.
+
+파일 설명
+studyTotal(no, userNum, studyTime, date, WeekSuccessCnt, TodaySuccess) 테이블 매핑
+*/
+
 package persistence
 
 import (
@@ -5,8 +16,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-// userNum, studyTime, date
 
 // 공부 시간 생성(당일 처음 공부 시작한 경우 )
 func InsertNewStudyTotal(userNum int, studyTime int) int {

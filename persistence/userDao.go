@@ -1,3 +1,14 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 박현준
+수정일 : 2022.04.22.
+
+파일 설명
+User(userNum, userId, guildId, userName, userType, wantTime, wantCnt) 테이블 매핑
+*/
+
 package persistence
 
 import (
@@ -5,8 +16,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-// userNum, userId, guildId, userName, userType, wantTime, wantCnt
 
 // User 추가 (기본 공부 목표 주 5회 3시간)
 func UserSave(u ds.User) (*int64, error) {
@@ -76,6 +85,7 @@ func UserListFindByGuildId(guildId string) ([]ds.User, error) {
 	return users, err
 }
 
+// DB에 존재하는 길드 목록 반환
 func SelectGuildIdList() ([]string, error) {
 	db := getConnection()
 	err := db.Ping()
@@ -95,7 +105,7 @@ func SelectGuildIdList() ([]string, error) {
 	return guildIds, err
 }
 
-// 유저 타입
+// 유저 타입 수정
 func UpdateUserType(u ds.User) (*int64, error) {
 	db := getConnection()
 	err := db.Ping()
@@ -128,83 +138,3 @@ func DeleteUser(userId string) (*int64, error) {
 	}
 	return &no, err
 }
-
-// SELECT 예시
-// func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error) {
-
-// 	db := getConnection()
-// 	sql := `SELECT userNum
-// 	FROM user WHERE userId=? AND guildId=?`
-// 	stmt, _ := db.Prepare(sql)
-
-// 	// 행 하나 : QueryRow
-// 	var userNum int
-// 	err := stmt.QueryRow(userId, guildId).Scan(&userNum)
-
-// 	// 여러 행 : Query
-// 	// var userNum int
-// 	// res, err := stmt.Query(userId, guildId)
-// 	// for res.Next() {
-// 	// 	res.Scan(&userNum)
-// 	// }
-// 	stmt.Close()
-// 	return userNum, err
-// }
-
-// Todo 삭제 - 사유 : 빠따 -> 성공 회수
-// func SelectBbadda(userNum int) (int, error) {
-// 	db := getConnection()
-// 	err := db.Ping()
-// 	var bbadda int64
-// 	if err == nil {
-// 		sql := `SELECT bbadda
-// 		FROM user WHERE userNum = ?`
-// 		stmt, _ := db.Prepare(sql)
-// 		err = stmt.QueryRow(userNum).Scan(&bbadda)
-// 		stmt.Close()
-// 	}
-// 	defer db.Close()
-// 	db.Close()
-// 	return int(bbadda), err
-// }
-
-// Todo 삭제 - 사유 : 빠따 -> 성공 회수
-// func SelectOverBbadaa(guildId string, bbaddaLimit int) ([]ds.User, error) {
-// 	db := getConnection()
-// 	err := db.Ping()
-// 	var user ds.User
-// 	var users []ds.User
-// 	if err == nil {
-// 		sql := `select userNum, userId, guildId, userName, bbadda, userType from user where guildId = ? and bbadda > ?`
-// 		stmt, _ := db.Prepare(sql)
-// 		res, _ := stmt.Query(guildId, bbaddaLimit)
-
-// 		for res.Next() {
-// 			res.Scan(&user.UserNum, &user.UserId, &user.GuildId, &user.UserName, &user.Bbadda, &user.UserType)
-// 			users = append(users, user)
-// 		}
-// 		stmt.Close()
-// 	}
-// 	defer db.Close()
-// 	return users, err
-// }
-
-// Todo 삭제 - 사유 : 빠따 -> 성공 회수
-// 빠따 카운트 + 1
-// func UpdateBbaddaByUserNum(userNum int) (*int64, error) {
-// 	db := getConnection()
-// 	err := db.Ping()
-// 	var no int64
-// 	if err == nil {
-// 		sql := `UPDATE user SET bbadda = bbadda+1
-// 		WHERE userNum = ?`
-
-// 		stmt, _ := db.Prepare(sql)
-// 		res, _ := stmt.Exec(userNum)
-
-// 		no, err = res.RowsAffected()
-// 		stmt.Close()
-// 	}
-// 	defer db.Close()
-// 	return &no, err
-// }

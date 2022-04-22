@@ -1,3 +1,14 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 김민우
+수정일 : 2022.04.22.
+
+파일 설명
+사용자의 메시지를 받아 답해주는 챗 봇 기능이 있는 파일
+*/
+
 package business
 
 import (
@@ -14,7 +25,6 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	request := m.Content
 
 	userNum, _ := ps.SelectUserNumByUserIdAndGuildId(m.Author.ID, m.GuildID)
-	// bbadda, _ := ps.SelectBbadda(userNum)
 	user, _ := ps.UserFindByUserNum(userNum)
 	studyTime, _ := ps.SelectStudyTotalTodayByUserNum(userNum)
 
@@ -24,10 +34,8 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		userList, _ := ps.UserListFindByGuildId(m.GuildID)
 		msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
 		for _, user = range userList {
-			// bbadda, _ = ps.SelectBbadda(user.UserNum)
 			studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
 			subMsg = fmt.Sprintf("%s : %s\n", user.UserName, minuteToHour(studyTime))
-			// subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
 			msg += subMsg
 		}
 	}
@@ -87,40 +95,6 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 	}
-
-	// 강퇴 기능 추가 중
-	// slice := strings.Split(request, ".")
-	// fmt.Println(slice)
-	// if slice[0] == "!강퇴" {
-	// 	user, _ := persistence.SelectUserByUserNum(userNum)
-	// 	if slice[1] == user.UserName {
-	// 		fmt.Println(m.GuildID)
-	// 		fmt.Println(user.UserId)
-	// 		err := s.GuildMemberDeleteWithReason(m.GuildID, user.UserId, "빠따 초과")
-	// 		fmt.Println(err)
-	// 	}
-	// }
-
-	// Todo - 빠따 삭제로 관련 기능 삭제
-	// if request == "!빠따" {
-	// 	msg = fmt.Sprintf("[%s] %s : %d 개", time.Now().Format("20060102 15:04"), user.UserName, bbadda)
-	// }
-	//
-	// if request == "!정산" {
-	// 	userList, _ := ps.SelectUserList(m.GuildID)
-	//
-	// 	msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
-	// 	for _, user = range userList {
-	// 		bbadda, _ = ps.SelectBbadda(user.UserNum)
-	// 		studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
-	// 		if studyTime <= 180 {
-	// 			ps.UpdateBbaddaByUserNum(user.UserNum)
-	// 			bbadda, _ = ps.SelectBbadda(user.UserNum)
-	// 		}
-	// 		subMsg = fmt.Sprintf("%s : %s / %d 개\n", user.UserName, minuteToHour(studyTime), bbadda)
-	// 		msg += subMsg
-	// 	}
-	// }
 	s.ChannelMessageSend(m.ChannelID, msg)
 }
 

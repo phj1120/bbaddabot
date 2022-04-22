@@ -1,3 +1,13 @@
+/*
+작성자 : 박현준
+작성일 : 2022.03.19.
+
+수정자 : 박현준
+수정일 : 2022.03.19.
+
+파일 설명
+목표 달성 못한 유저 강퇴
+*/
 package business
 
 // import (
@@ -7,7 +17,7 @@ package business
 // 	"github.com/bwmarrin/discordgo"
 // )
 
-// TODO 빠따 삭제로 관련 기능 삭제
+// // TODO 빠따 삭제로 관련 기능 삭제. 추후 DB 에 맞게 변경 할 것.
 // func ThrowOut(s *discordgo.Session, bbaddaLimit int) {
 // 	guildList, _ := persistence.SelectGuildIdList()
 // 	fmt.Println(guildList)
