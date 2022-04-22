@@ -10,7 +10,7 @@ import (
 
 // User 추가 (기본 공부 목표 주 5회 3시간)
 func UserSave(u ds.User) (*int64, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var id int64
 	if err == nil {
@@ -22,13 +22,12 @@ func UserSave(u ds.User) (*int64, error) {
 		id, err = res.LastInsertId()
 		stmt.Close()
 	}
-	defer db.Close()
 	return &id, err
 }
 
 // User 조회
 func UserFindByUserNum(userNum int) (ds.User, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var user ds.User
 	if err == nil {
@@ -39,13 +38,12 @@ func UserFindByUserNum(userNum int) (ds.User, error) {
 		err = stmt.QueryRow(userNum).Scan(&user.UserNum, &user.UserId, &user.GuildId, &user.UserName, &user.UserType, &user.WantTime, &user.WantCnt)
 		stmt.Close()
 	}
-	defer db.Close()
 	return user, err
 }
 
 // UserNum 조회
 func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var userNum int64
 	if err == nil {
@@ -54,14 +52,12 @@ func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error)
 		err = stmt.QueryRow(userId, guildId).Scan(&userNum)
 		stmt.Close()
 	}
-	defer db.Close()
-	db.Close()
 	return int(userNum), err
 }
 
 // 해당 길드의 User 리스트 조회
 func UserListFindByGuildId(guildId string) ([]ds.User, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var user ds.User
 	var users []ds.User
@@ -77,12 +73,11 @@ func UserListFindByGuildId(guildId string) ([]ds.User, error) {
 		}
 		stmt.Close()
 	}
-	defer db.Close()
 	return users, err
 }
 
 func SelectGuildIdList() ([]string, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var guildId string
 	var guildIds []string
@@ -97,13 +92,12 @@ func SelectGuildIdList() ([]string, error) {
 		}
 		stmt.Close()
 	}
-	defer db.Close()
 	return guildIds, err
 }
 
 // 유저 타입
 func UpdateUserType(u ds.User) (*int64, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var no int64
 	if err == nil {
@@ -115,13 +109,12 @@ func UpdateUserType(u ds.User) (*int64, error) {
 		no, err = res.LastInsertId()
 		stmt.Close()
 	}
-	defer db.Close()
 	return &no, err
 }
 
 // 사용자 삭제
 func DeleteUser(userId string) (*int64, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var no int64
 	if err == nil {
@@ -133,14 +126,13 @@ func DeleteUser(userId string) (*int64, error) {
 		no, err = res.RowsAffected()
 		stmt.Close()
 	}
-	defer db.Close()
 	return &no, err
 }
 
 // SELECT 예시
 // func SelectUserNumByUserIdAndGuildId(userId string, guildId string) (int, error) {
 
-// 	db := dbConn()
+// 	db := getConnection()
 // 	sql := `SELECT userNum
 // 	FROM user WHERE userId=? AND guildId=?`
 // 	stmt, _ := db.Prepare(sql)
@@ -161,7 +153,7 @@ func DeleteUser(userId string) (*int64, error) {
 
 // Todo 삭제 - 사유 : 빠따 -> 성공 회수
 // func SelectBbadda(userNum int) (int, error) {
-// 	db := dbConn()
+// 	db := getConnection()
 // 	err := db.Ping()
 // 	var bbadda int64
 // 	if err == nil {
@@ -178,7 +170,7 @@ func DeleteUser(userId string) (*int64, error) {
 
 // Todo 삭제 - 사유 : 빠따 -> 성공 회수
 // func SelectOverBbadaa(guildId string, bbaddaLimit int) ([]ds.User, error) {
-// 	db := dbConn()
+// 	db := getConnection()
 // 	err := db.Ping()
 // 	var user ds.User
 // 	var users []ds.User
@@ -200,7 +192,7 @@ func DeleteUser(userId string) (*int64, error) {
 // Todo 삭제 - 사유 : 빠따 -> 성공 회수
 // 빠따 카운트 + 1
 // func UpdateBbaddaByUserNum(userNum int) (*int64, error) {
-// 	db := dbConn()
+// 	db := getConnection()
 // 	err := db.Ping()
 // 	var no int64
 // 	if err == nil {
