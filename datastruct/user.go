@@ -7,4 +7,6 @@ type User struct {
 	UserName string
 	Bbadda   int
 	UserType string
+	WantTime int
+	WantCnt  int
 }
