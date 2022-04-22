@@ -47,10 +47,10 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} else {
 			switch {
 			// Set Channel Type
-			case strings.HasPrefix(setting[1], "채팅채널"):
+			case setting[1] == "채팅채널":
 
 				// set channel type If there's flag after "채팅채널"
-				if len(setting) >= 3 {
+				if len(setting) == 3 {
 					channelType := setting[2]
 
 					msg = "---------채널 설정 완료---------\n"
@@ -73,9 +73,17 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 						msg += " 현재 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
 					}*/
 
-			case strings.HasPrefix(setting[1], "음성채널"):
+			// Set voice channel type
+			case setting[1] == "음성채널":
 				msg = "기능준비중"
+
+			// Show help message if command is none of listed
+			default:
+				msg = "---------설정명령어---------\n"
+				msg += "!설정 채팅채널 : 채널 현재 설정상태 출력\n"
+				msg += "!설정 채팅채널 [채널타입] : 특정 채널 타입으로 설정"
 			}
+
 		}
 
 	}
