@@ -12,14 +12,23 @@ SELECT * FROM bbaddabot.user;
 ## 오늘 데이터 조회
 SELECT * FROM bbaddabot.studyTotal where date(date) = date(now());
 
-SELECT * FROM bbaddabot.history where date(time) = date(now());
+SELECT * FROM bbaddabot.history where date(time) = date(now()) and userNum = 13;
 
 ## 총 데이터 조회
 SELECT COUNT(*) FROM bbaddabot.history;
 
 ## 개인별 일일 공부 시간 조회
 SELECT * FROM bbaddabot.studyTotal
-WHERE userNum = (SELECT userNum FROM bbaddabot.user WHERE userName="박현준" AND guildId = "951671348298661938");
+WHERE userNum = (SELECT userNum FROM bbaddabot.user WHERE userName="박현준" AND guildId = "951671348298661938")
+AND date='2022-04-12';
+
+SELECT * FROM bbaddabot.studyTotal
+WHERE userNum = (SELECT userNum FROM bbaddabot.user WHERE userName="유민상" AND guildId = "951671348298661938")
+AND date='2022-04-11';
+
+
+SELECT * FROM bbaddabot.studyTotal
+WHERE date='2022-04-22';
 
 ## 길드 아이디, 유저 아이디로 오늘 (0 ~ 24) 공부한 시간 조회
 select studytime from bbaddabot.studyTotal
@@ -41,15 +50,34 @@ DATE_FORMAT(DATE_SUB(`date`, INTERVAL (DAYOFWEEK(`date`)-7) DAY), '%Y/%m/%d') as
 DATE_FORMAT(`date`, '%Y%U') AS `date`, sum(`studyTime`)  as weekStudy
 FROM bbaddabot.studyTotal GROUP BY userNum;
 
-# 열 삭제
-alter table bbaddabot.studytotal drop column todaySuccess;
-alter table bbaddabot.user drop column wantTime;
-alter table bbaddabot.user drop column  wantCnt;
+select version();
+show status;
+show status like '%thread%';
 
-# 열 추가
-alter table bbaddabot.user add wantTime int default 180;
-alter table bbaddabot.user add  wantCnt int default 5;
+-- 유저별 이번주 공부 시간 구하기
+-- https://suzxc2468.tistory.com/145
+SELECT
+    userNum, sum(studyTime)
+FROM
+    studyTotal
+WHERE
+    date_format(date,'%Y-%m-%d')
+    BETWEEN
+        (SELECT ADDDATE(CURDATE(), - WEEKDAY(CURDATE()) + 0 ))
+    AND
+        (SELECT ADDDATE(CURDATE(), - WEEKDAY(CURDATE()) + 6 ))
+group by userNum;
 
-alter table bbaddabot.studytotal add todaySuccess boolean default false;
-alter table bbaddabot.studytotal add weekSuccessCnt int default 0;
-
+-- 이번달 공부 시간 구하기
+-- https://blog.naver.com/PostView.nhn?isHttpsRedirect=true&blogId=classe82&logNo=20149848301&redirect=Dlog&widgetTypeCall=true
+SELECT
+    userNum, sum(studyTime)
+FROM
+    studyTotal
+WHERE
+    date_format(date,'%Y-%m-%d')
+    BETWEEN
+        (SELECT LAST_DAY(NOW() - interval 1 month))
+    AND
+        (SELECT LAST_DAY(NOW()))
+group by userNum;

@@ -56,7 +56,6 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 					msg = "---------채널 설정 완료---------\n"
 					msg += "이전 채널 이름 : " + ps.SelectChannelNameById(m.ChannelID)
 					msg += " 이전 채널 설정 : " + ps.SelectChannelTypeById(m.ChannelID)
-
 					ps.UpdateChannelType(m.ChannelID, channelType) // Set channel type
 				}
 
@@ -115,7 +114,6 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// 	}
 	// }
 	s.ChannelMessageSend(m.ChannelID, msg)
-
 }
 
 func minuteToHour(minute int) string {

@@ -11,7 +11,7 @@ import (
 
 // history 삽입 후 auto_increment 반환
 func InsertHistory(h ds.History) (int, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var id int64
 	if err == nil {
@@ -24,13 +24,12 @@ func InsertHistory(h ds.History) (int, error) {
 		id, err = res.LastInsertId()
 		stmt.Close()
 	}
-	defer db.Close()
 	return int(id), err
 }
 
 // 오늘 공부 기록 조회해 목록 반환
 func SelectTodayHistoryByUserNum(userNum int) []ds.History {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var historys []ds.History
 	if err == nil {
@@ -49,13 +48,12 @@ func SelectTodayHistoryByUserNum(userNum int) []ds.History {
 		}
 		stmt.Close()
 	}
-	defer db.Close()
 	return historys
 }
 
 // UserNum 을 받아서 최신의 값 2개만 가져오고 그 값으로 비교해보자.
 func SelectMinuteSpentByUserNum(userNum int) int {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var studyTime int
 	if err == nil {
@@ -77,6 +75,5 @@ func SelectMinuteSpentByUserNum(userNum int) int {
 		stmt.QueryRow(userNum, userNum).Scan(&studyTime)
 		stmt.Close()
 	}
-	defer db.Close()
 	return studyTime
 }
