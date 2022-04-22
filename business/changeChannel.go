@@ -102,7 +102,7 @@ func ChangeChannel(s *discordgo.Session, v discordgo.VoiceStateUpdate) {
 			totalStudyTime, err = ps.SelectStudyTotalTodayByUserNum(histoty.UserNum)
 			if err != nil {
 				// 당일에 처음 기록 하는 경우
-				ps.InsertNewStudyTotal(histoty.UserNum, spentMinute)
+				ps.InsertNewStudyTotalByUserNumAndStudyTime(histoty.UserNum, spentMinute)
 			} else {
 				ps.UpdateStudyTimeByUserNumAndStudyTime(histoty.UserNum, spentMinute)
 			}

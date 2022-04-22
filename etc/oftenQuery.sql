@@ -81,3 +81,31 @@ WHERE
     AND
         (SELECT LAST_DAY(NOW()))
 group by userNum;
+
+
+
+# 유저 한 명
+SELECT
+    userNum, sum(studyTime)
+FROM
+    studyTotal
+WHERE
+    date_format(date,'%Y-%m-%d')
+    BETWEEN
+        (SELECT ADDDATE(CURDATE(), - WEEKDAY(CURDATE()) + 0 ))
+    AND
+        (SELECT ADDDATE(CURDATE(), - WEEKDAY(CURDATE()) + 6 ))
+	AND
+		userNum = '1';
+        
+SELECT
+    sum(studyTime)
+FROM
+    studyTotal
+WHERE
+    date_format(date,'%Y-%m-%d')
+    BETWEEN
+        (SELECT LAST_DAY(NOW() - interval 1 month))
+    AND
+        (SELECT LAST_DAY(NOW()))
+	AND userNum = '1';

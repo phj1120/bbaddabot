@@ -69,7 +69,7 @@ func StudyTotalDaoTest() {
 	// 오늘 공부가 처음이면 오늘 기록 새로 생성 및 조회
 	if err != nil {
 		fmt.Println("InsertNewStudyTotal ")
-		id := persistence.InsertNewStudyTotal(studyTotal.UserNum, studyTotal.StudyTime)
+		id := persistence.InsertNewStudyTotalByUserNumAndStudyTime(studyTotal.UserNum, studyTotal.StudyTime)
 		fmt.Println(id)
 		studyTime, _ = persistence.SelectStudyTotalTodayByUserNum(studyTotal.UserNum)
 	}

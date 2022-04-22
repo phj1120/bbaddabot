@@ -26,22 +26,39 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	userNum, _ := ps.SelectUserNumByUserIdAndGuildId(m.Author.ID, m.GuildID)
 	user, _ := ps.UserFindByUserNum(userNum)
-	studyTime, _ := ps.SelectStudyTotalTodayByUserNum(userNum)
 
 	var msg string
 	var subMsg string
+	var studyTime int
+
 	if request == "!기록" || request == "!ㄱㄹ" {
 		userList, _ := ps.UserListFindByGuildId(m.GuildID)
 		msg = fmt.Sprintf("[%s]\n", time.Now().Format("20060102 15:04"))
 		for _, user = range userList {
-			studyTime, _ = ps.SelectStudyTotalTodayByUserNum(user.UserNum)
+			studyTime, _ = ps.SelectStudyTotalTodayByUserIdAndGuildId(user.UserId, user.GuildId)
 			subMsg = fmt.Sprintf("%s : %s\n", user.UserName, minuteToHour(studyTime))
 			msg += subMsg
 		}
 	}
 
-	if request == "!공부시간" || request == "!ㄱㅄㄱ" {
-		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("20060102 15:04"), user.UserName, minuteToHour(studyTime))
+	if request == "!일" {
+		studyTime, _ = ps.SelectStudyTotalTodayByUserIdAndGuildId(m.Author.ID, m.GuildID)
+		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("2006년 01월 02일"), user.UserName, minuteToHour(studyTime))
+	}
+
+	if request == "!주" {
+		studyTime, _ = ps.SelectStudyTotalWeekByUserIdAndGuildId(m.Author.ID, m.GuildID)
+
+		now := time.Now()
+		firstWeekDay := time.Date(now.Year(), now.Month(), 1, now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), now.Location())
+		// 현재 주차 = ( 현재 요일 + 1일 요일 숫자 - 1) / 7 + 1
+		weekNumber := (now.Day()+int(firstWeekDay.Weekday())-1)/7 + 1
+		msg = fmt.Sprintf("[%s %d주차] %s: %s", time.Now().Format("2006년 01월"), weekNumber, user.UserName, minuteToHour(studyTime))
+	}
+
+	if request == "!달" {
+		studyTime, _ = ps.SelectStudyTotalMonthByUserIdAndGuildId(m.Author.ID, m.GuildID)
+		msg = fmt.Sprintf("[%s] %s : %s", time.Now().Format("2006년 01월"), user.UserName, minuteToHour(studyTime))
 	}
 
 	// Server setting command
@@ -99,11 +116,17 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func minuteToHour(minute int) string {
+	var d int
 	var m int
 	var h int
 	var msg string
-
-	if minute >= 60 {
+	println(minute)
+	if minute > 60*24 {
+		d = minute / (24 * 60)
+		h = (minute - d*24*60) / 60
+		m = minute - h*60 - d*24*60
+		msg = fmt.Sprintf("%d 일 %d 시간 %d 분", d, h, m)
+	} else if minute >= 60 {
 		h = minute / 60
 		m = minute - h*60
 		msg = fmt.Sprintf("%d 시간 %d 분", h, m)
