@@ -10,7 +10,7 @@ import (
 
 // 채널 추가
 func InsertChannel(c ds.Channel) int {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var id int64
 	if err == nil {
@@ -22,18 +22,15 @@ func InsertChannel(c ds.Channel) int {
 		id, _ = res.RowsAffected()
 		stmt.Close()
 	}
-	defer db.Close()
 	return int(id)
 }
 
 // 채널 아이디로 채널 이름 조회
 func SelectChannelNameById(chnnelId string) string {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var channelName string
 	if err == nil {
-
-		db := dbConn()
 		sql := `SELECT channelName
 				FROM channel
 				WHERE channelId = ?`
@@ -42,13 +39,12 @@ func SelectChannelNameById(chnnelId string) string {
 		stmt.QueryRow(chnnelId).Scan(&channelName)
 		stmt.Close()
 	}
-	defer db.Close()
 	return channelName
 }
 
 // 채널 아이디로 채널 타입 조회
 func SelectChannelTypeById(channelId string) string {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var channelType string
 	if err == nil {
@@ -60,13 +56,12 @@ func SelectChannelTypeById(channelId string) string {
 		stmt.QueryRow(channelId).Scan(&channelType)
 		stmt.Close()
 	}
-	defer db.Close()
 	return channelType
 }
 
 // 채널 타입 변경
 func UpdateChannelType(channelId string, channelType string) int {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var cnt int64
 	if err == nil {
@@ -78,6 +73,5 @@ func UpdateChannelType(channelId string, channelType string) int {
 		cnt, _ = res.RowsAffected()
 		stmt.Close()
 	}
-	defer db.Close()
 	return int(cnt)
 }

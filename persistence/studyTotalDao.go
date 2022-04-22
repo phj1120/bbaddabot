@@ -10,7 +10,7 @@ import (
 
 // 공부 시간 생성(당일 처음 공부 시작한 경우 )
 func InsertNewStudyTotal(userNum int, studyTime int) int {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var id int64
 	if err == nil {
@@ -22,13 +22,12 @@ func InsertNewStudyTotal(userNum int, studyTime int) int {
 		id, _ = res.LastInsertId()
 		stmt.Close()
 	}
-	defer db.Close()
 	return int(id)
 }
 
 // 오늘 공부 시간 조회
 func SelectStudyTotalTodayByUserNum(userNum int) (int, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var studyTime int
 	if err == nil {
@@ -40,12 +39,11 @@ func SelectStudyTotalTodayByUserNum(userNum int) (int, error) {
 		err = stmt.QueryRow(userNum).Scan(&studyTime)
 		stmt.Close()
 	}
-	defer db.Close()
 	return studyTime, err
 }
 
 func SelectStudyTotalToday(userId string, guildId string) (int, error) {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var studyTime int
 	if err == nil {
@@ -58,14 +56,13 @@ func SelectStudyTotalToday(userId string, guildId string) (int, error) {
 		err = stmt.QueryRow(userId, guildId).Scan(&studyTime)
 		stmt.Close()
 	}
-	defer db.Close()
 	return studyTime, err
 
 }
 
 // 공부 시간 업데이트 후 영향 받은 행 개수 반환
 func UpdateStudyTimeByUserNumAndStudyTime(userNum int, studyTime int) int {
-	db := dbConn()
+	db := getConnection()
 	err := db.Ping()
 	var cnt int64
 	if err == nil {
@@ -78,6 +75,5 @@ func UpdateStudyTimeByUserNumAndStudyTime(userNum int, studyTime int) int {
 		cnt, _ = res.RowsAffected()
 		stmt.Close()
 	}
-	defer db.Close()
 	return int(cnt)
 }
