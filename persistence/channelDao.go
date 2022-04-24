@@ -92,7 +92,7 @@ func SelectChannelIdByChannelTypeAndGuildId(channelType string, guildId string) 
 }
 
 // 채널 타입 변경
-func UpdateChannelType(channelId string, channelType string) int {
+func UpdateChannelType(channelId string, channelType string) (int, error) {
 	db := getConnection()
 	err := db.Ping()
 	var cnt int64
@@ -105,5 +105,5 @@ func UpdateChannelType(channelId string, channelType string) int {
 		cnt, _ = res.RowsAffected()
 		stmt.Close()
 	}
-	return int(cnt)
+	return int(cnt), err
 }
