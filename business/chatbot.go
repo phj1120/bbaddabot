@@ -51,8 +51,8 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		now := time.Now()
 		firstWeekDay := time.Date(now.Year(), now.Month(), 1, now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), now.Location())
-		// 현재 주차 = ( 현재 요일 + 1일 요일 숫자 - 1) / 7 + 1
-		weekNumber := (now.Day()+int(firstWeekDay.Weekday())-1)/7 + 1
+		// 현재 주차 = ( 현재 요일 + 1일 요일 숫자 - 2) / 7 + 1
+		weekNumber := (now.Day()+int(firstWeekDay.Weekday())-2)/7 + 1
 		msg = fmt.Sprintf("[%s %d주차] %s: %s", time.Now().Format("2006년 01월"), weekNumber, user.UserName, minuteToHour(studyTime))
 	}
 
@@ -137,7 +137,6 @@ func minuteToHour(minute int) string {
 	var m int
 	var h int
 	var msg string
-	println(minute)
 	if minute > 60*24 {
 		d = minute / (24 * 60)
 		h = (minute - d*24*60) / 60
