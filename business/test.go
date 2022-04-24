@@ -98,6 +98,6 @@ func ChannelTest() {
 	fmt.Print(channelName)
 
 	fmt.Println("UpdateChannelType")
-	cnt := persistence.UpdateChannelType(channel.ChannelId, "rest")
+	cnt, _ := persistence.UpdateChannelType(channel.ChannelId, "rest")
 	fmt.Println(cnt)
 }
