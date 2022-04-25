@@ -132,6 +132,26 @@ func Chatbot(s *discordgo.Session, m *discordgo.MessageCreate) {
 	s.ChannelMessageSend(m.ChannelID, msg)
 }
 
+func minuteToDay(minute int) string {
+	var d int
+	var m int
+	var h int
+	var msg string
+	if minute > 60*24 {
+		d = minute / (24 * 60)
+		h = (minute - d*24*60) / 60
+		m = minute - h*60 - d*24*60
+		msg = fmt.Sprintf("%d 일 %d 시간 %d 분", d, h, m)
+	} else if minute >= 60 {
+		h = minute / 60
+		m = minute - h*60
+		msg = fmt.Sprintf("%d 시간 %d 분", h, m)
+	} else {
+		msg = fmt.Sprintf("%d 분", minute)
+	}
+	return msg
+}
+
 func minuteToHour(minute int) string {
 	var d int
 	var m int
