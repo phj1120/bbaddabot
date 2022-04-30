@@ -105,7 +105,8 @@ FROM
 WHERE
     date_format(date,'%Y-%m-%d')
     BETWEEN
-        (SELECT LAST_DAY(NOW() - interval 1 month))
+        (SELECT DATE_FORMAT(NOW(), '%x-%m-01'))
     AND
         (SELECT LAST_DAY(NOW()))
 	AND userNum = '1';
+
