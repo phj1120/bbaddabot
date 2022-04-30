@@ -108,7 +108,7 @@ func SelectStudyTotalMonthByUserIdAndGuildId(userId string, guildId string) (int
 		WHERE
 			date 
 			BETWEEN
-				(SELECT LAST_DAY(NOW() - interval 1 month))
+				(SELECT DATE_FORMAT(NOW(), '%x-%m-01'))
 			AND
 				(SELECT LAST_DAY(NOW()))
 			AND
